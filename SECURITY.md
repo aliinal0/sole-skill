@@ -7,7 +7,7 @@ Sole is mostly Markdown instructions. This page lists everything in it that runs
 | Component | When | What it does |
 |---|---|---|
 | `hooks/load-context.sh` | Every session start, resume, clear and compaction | Prints one routing line and, if `.claude/CONTEXT.md` exists in the project, its first 200 lines. Reads nothing else, writes nothing, no network. |
-| `hooks/after-skill.sh` | After each Skill tool call | Reads the hook input from stdin; if the skill was Sole, prints a one-line reminder to read the routed module. Reads no files, writes nothing, no network. |
+| `hooks/after-skill.sh` | After each Skill tool call | Reads the hook input from stdin; if the skill was one of Sole's five, prints the Sole library path (from `CLAUDE_PLUGIN_ROOT`) and a one-line reminder to read the routed module. Reads no files, writes nothing, no network. |
 
 The hook frames `CONTEXT.md` as notes, not commands. A `CONTEXT.md` that comes with a cloned repository is treated as untrusted text.
 

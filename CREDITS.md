@@ -30,6 +30,7 @@ Sole does not copy these skills verbatim. Their ideas, structures and checklists
 | [browser-use/video-use](https://github.com/browser-use/video-use) | Browser Use | MIT | `build/video/edit.md`, `build/video/tells.md` (process, cut-edge and self-check rules) |
 | [nateherkai/herk-edit-kit](https://github.com/nateherkai/herk-edit-kit) | Nate Herk | MIT | `build/video/edit.md` (pause trimming that keeps a breath) |
 | [Tejashmakwana/motionmaxxing](https://github.com/Tejashmakwana/motionmaxxing) | Tejashmakwana | Apache-2.0 | `build/video/motion.md`, `build/video/tells.md` (judgments, craft laws, never-ship list; condensed and rewritten) |
+| [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) - `ponytail`, `ponytail-review`, `ponytail-audit`, `ponytail-debt` | DietrichGebert | MIT | `skills/code/SKILL.md` (smallest-complete-change ladder, `shortcut:` comments), `build/code-review.md` (review order, finding format, shortcut ledger); rewritten and condensed |
 
 The text pattern catalogue also builds on Wikipedia's "Signs of AI writing" guide (via `humanizer`).
 

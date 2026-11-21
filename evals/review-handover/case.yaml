@@ -14,7 +14,7 @@ graders:
   - type: tool_used
     name: read-review-module
     tool: Read
-    input_match: 'review\.md'
+    input_match: 'build[\\/]+review\.md'
     min: 1
     arm: with-only
   - type: llm

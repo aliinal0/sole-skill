@@ -43,6 +43,9 @@ jobs:
       - name: Script unit tests
         run: python3 -m unittest discover -s tests -v
 
+      - name: Check skills (description size, names, identical shared rules)
+        run: python3 -c "import sys; sys.path.insert(0, 'evals'); import run; p = run.skill_checks(); print('\n'.join(p) or 'skills ok'); sys.exit(1 if p else 0)"
+
       - name: Check module links
         run: |
           missing=0

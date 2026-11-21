@@ -44,7 +44,7 @@ EVALS = os.path.join(ROOT, "evals")
 SKILL = os.path.join(ROOT, "skills", "sole")
 RESULTS = os.path.join(EVALS, "results")
 CACHE = os.path.join(RESULTS, "cache")
-CORE = ["skills/sole/SKILL.md", ".claude-plugin/plugin.json", "hooks/*", "commands/*.md", "agents/*.md"]
+CORE = ["skills/*/SKILL.md", ".claude-plugin/plugin.json", "hooks/*", "commands/*.md", "agents/*.md"]
 LIMIT_RE = re.compile(r"hit your [^\n]*?limit[^\n]*?resets\s+([0-9]{1,2}(?::[0-9]{2})?\s*[ap]m|[0-9]{1,2}:[0-9]{2})", re.I)
 REF_RE = re.compile(r"`((?:core|build|business|research|write|templates|scripts)/[A-Za-z0-9/._-]+\.(?:md|py))`")
 STOP = threading.Event()
@@ -178,6 +178,32 @@ def cache_put(case, arm, key, runs, meta):
 
 # ---------------------------------------------------------------- free checks
 
+SHARED_RE = re.compile(r"^## Shared rules\n.*?(?=^## |\Z)", re.S | re.M)
+
+
+def skill_checks():
+    """Every Sole skill: a description of at most 1024 characters, a name that matches its folder, and the
+    same Shared rules block as the general skill (so limits and economy rules cannot drift apart)."""
+    problems, blocks = [], {}
+    for path in sorted(glob.glob(os.path.join(ROOT, "skills", "*", "SKILL.md"))):
+        name = os.path.basename(os.path.dirname(path))
+        text = open(path, encoding="utf-8").read()
+        m = re.search(r"^description:\s*(.*)$", text, re.M)
+        if not m or len(m.group(1)) > 1024:
+            problems.append(f"{name}: description missing or over 1024 characters ({len(m.group(1)) if m else 0})")
+        if not re.search(rf"^name:\s*{re.escape(name)}\s*$", text, re.M):
+            problems.append(f"{name}: frontmatter name does not match its folder")
+        b = SHARED_RE.search(text)
+        blocks[name] = b.group(0).strip() if b else None
+    ref = blocks.get("sole")
+    for name, b in blocks.items():
+        if b is None:
+            problems.append(f"{name}: no '## Shared rules' block")
+        elif ref and b != ref:
+            problems.append(f"{name}: Shared rules block differs from skills/sole/SKILL.md")
+    return problems
+
+
 def static_checks(claude):
     problems = []
     proc = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", "tests"], cwd=ROOT,
@@ -190,10 +216,7 @@ def static_checks(claude):
                                encoding="utf-8", errors="replace")
             if v.returncode:
                 problems.append(f"plugin validate {target} failed:\n{(v.stdout + v.stderr)[-1500:]}")
-    skill = open(os.path.join(SKILL, "SKILL.md"), encoding="utf-8").read()
-    m = re.search(r"^description:\s*(.*)$", skill, re.M)
-    if not m or len(m.group(1)) > 1024:
-        problems.append(f"skill description missing or over 1024 characters ({len(m.group(1)) if m else 0})")
+    problems += skill_checks()
     for path in glob.glob(os.path.join(ROOT, "skills", "**", "*.md"), recursive=True) + \
             glob.glob(os.path.join(ROOT, "commands", "*.md")) + glob.glob(os.path.join(ROOT, "agents", "*.md")):
         if path.endswith("personas.md"):

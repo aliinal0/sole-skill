@@ -3,7 +3,7 @@
 # 1. A one-line routing hint so Claude invokes the Sole skill for matching work.
 # 2. The project's .claude/CONTEXT.md (if present), capped by lines so multi-byte
 #    characters (e.g. accented letters) are never cut in half.
-echo "Sole plugin is active: for UI/design, video editing, browser page checks, writing or humanizing text (READMEs, docs, UI copy), teaching a concept, security review, codebase maps, ads/marketing, ideas, competitors, SEO/GEO/schema, pricing, specialist personas, multi-source research, blocked URLs, project memory or setup retrospectives, invoke the Skill \"sole:sole\" first. Skip it for trivial questions."
+echo "Sole plugin is active. Before work in its area, invoke the matching Sole skill: sole:code (writing, fixing or reviewing code), sole:visual (UI, images, video), sole:write (any text), sole:business (marketing, SEO, pricing), sole:sole (research, blocked pages, teaching, project memory, setup fixes). Skip for trivial questions."
 
 dir="${CLAUDE_PROJECT_DIR:-$PWD}"
 file="$dir/.claude/CONTEXT.md"

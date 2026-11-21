@@ -14,7 +14,7 @@
 
 Claude Code skills are instruction manuals you give Claude for specific jobs: one for design, one for writing, one for SEO, and so on. Most people end up with a shelf full of them. Claude reads the cover of every manual in every session, several manuals answer the same request, and their advice often clashes.
 
-Sole replaces the shelf with one book that has a table of contents. When you ask for something, Claude checks the table of contents, opens the one or two chapters that fit, and works from those. The chapters it does not need stay closed.
+Sole replaces the shelf with five slim books that share one library: code, visual work, writing, business, and a general one for research, teaching and project memory. When you ask for something, Claude opens the one book for that area, checks its table of contents, and reads only the one or two chapters that fit. The other books and chapters stay closed.
 
 ## Does it make a difference?
 
@@ -72,6 +72,7 @@ You do not have to use commands. Ask for what you want in plain words and Sole p
 | `/sole:check <url>` | Opens a page in Chrome and checks layout on different screen sizes, errors, accessibility and speed (needs `sole-browser`) |
 | `/sole:video plan\|edit\|review\|style [file]` | Plans or cuts a video so it looks edited by a person, reviews an edit for signs of automatic editing, or learns your editing style |
 | `/sole:seo <step> <url>` | SEO work: `audit`, `technical`, `content`, `schema`, `local`, `geo` (visibility in AI search) and more |
+| `/sole:review [branch\|PR\|path\|repo\|shortcuts]` | Reviews a change, or the whole repo, like a senior developer: bugs, security, what breaks under load, missing tests, and code that should not exist. Changes nothing |
 | `/sole:security [quick\|full\|file]` | Reviews your code for security problems without changing anything |
 | `/sole:research <question>` | Splits a research question across several helpers and saves a report with sources |
 | `/sole:fetch <url>` | Reads a web page that Claude's normal reader cannot open |
@@ -85,10 +86,10 @@ You do not have to use commands. Ask for what you want in plain words and Sole p
 ## FAQ
 
 **Should I uninstall my other skills?**
-Yes, for the ones Sole replaces. If they stay, two skills react to the same request with different rules. Remove `frontend-design`, `impeccable`, `design-taste-frontend`, `frontend-design-deslop`, `humanizer`, `unslop`, `caveman`, `grill-me`, `grilling`, `handoff`, `deep-research`, `deep-dive`, `fetching-blocked-urls`, `security-audit`, `improve`, Corey Haines' marketing skills, Agency Agents copied into `~/.claude/agents`, and Google's own `chrome-devtools-mcp` plugin if you use `sole-browser`. Two can stay: **graphify**, whose code map Sole uses, and **claude-seo**, if you need its Google API connections and PDF reports. Run `/plugin` to see what you have installed.
+Yes, for the ones Sole replaces. If they stay, two skills react to the same request with different rules. Remove `ponytail`, `frontend-design`, `impeccable`, `design-taste-frontend`, `frontend-design-deslop`, `humanizer`, `unslop`, `caveman`, `grill-me`, `grilling`, `handoff`, `deep-research`, `deep-dive`, `fetching-blocked-urls`, `security-audit`, `improve`, Corey Haines' marketing skills, Agency Agents copied into `~/.claude/agents`, and Google's own `chrome-devtools-mcp` plugin if you use `sole-browser`. Two can stay: **graphify**, whose code map Sole uses, and **claude-seo**, if you need its Google API connections and PDF reports. Run `/plugin` to see what you have installed.
 
 **Does it cost more?**
-Each answer costs a little more, because Sole reads one chapter before answering. In our tests (39 cases at API list prices) a run with Sole cost about 1.4 times as much as one without. But Sole gave many more right answers, so the cost per correct answer was about 30% lower: $0.20 against $0.29. You also save elsewhere: Claude does not reread a whole conversation or codebase after a reset, does not redo work, and you are not running several overlapping skills at once. For simple questions Sole is not loaded at all. Its only fixed cost is its short description and a one-line hint at the start of each session.
+Each answer costs a little more, because Sole reads a short skill file and often one chapter before answering. In our tests (41 cases at API list prices) a run with Sole cost about 1.4 times as much as one without. But Sole gave many more right answers (38 of 41 against 18 of 41), so the cost per correct answer was about 30% lower: $0.19 against $0.28. You also save elsewhere: Claude does not reread a whole conversation or codebase after a reset, does not redo work, writes less code you have to review, and you are not running several overlapping skills at once. For simple questions Sole is not loaded at all. Its fixed cost is the five skills' short descriptions and a one-line hint at the start of each session.
 
 ## Limits
 
@@ -102,8 +103,8 @@ Each answer costs a little more, because Sole reads one chapter before answering
 
 ```mermaid
 flowchart LR
-    R["Your request"] --> S["Router<br/>SKILL.md"]
-    S -->|"opens 1-2"| M["Modules<br/>core · build · business · research · write"]
+    R["Your request"] --> S["One of five skills<br/>code · visual · write · business · sole"]
+    S -->|"opens 1-2"| M["Shared library skills/sole/<br/>core · build · business · research · write"]
     M --> A["Shared agents<br/>researcher · web-fetcher · critic<br/>strategist · memory-keeper · security-auditor"]
     H["SessionStart hook"] -.->|"loads .claude/CONTEXT.md"| S
     M -.->|"optional"| B["sole-browser<br/>Chrome DevTools MCP"]
@@ -111,11 +112,13 @@ flowchart LR
 
 Sole loads in three levels, so most of it costs nothing until it is needed:
 
-1. **Always loaded:** the skill's description (about 150 words) and a one-line hint printed by the SessionStart hook.
-2. **When a request matches:** the router, [`skills/sole/SKILL.md`](skills/sole/SKILL.md), about 60 lines. It holds a few always-on rules and a table that maps kinds of requests to modules.
+1. **Always loaded:** the five skills' descriptions and a one-line hint printed by the SessionStart hook.
+2. **When a request matches:** one skill file: [`code`](skills/code/SKILL.md), [`visual`](skills/visual/SKILL.md), [`write`](skills/write/SKILL.md), [`business`](skills/business/SKILL.md) or the general [`sole`](skills/sole/SKILL.md). Each holds a table for its own area and the same short block of shared rules. The code skill also holds the coding rules themselves, so most coding needs nothing else.
 3. **On demand:** one or two module files, each under 100 lines.
 
-The modules are grouped in five folders under `skills/sole/`:
+The code skill works like a lazy senior developer: it looks for what the codebase, the standard library or an installed package already offers before writing anything, adds no options or layers nobody asked for, leaves a small test for logic that can break, and ends with what it did not check. Its review mode (`/sole:review`) ranks findings by correctness, safety, load, tests, speed and lean code, and every finding needs a concrete failing case.
+
+The modules are grouped in five folders under `skills/sole/`, the shared library:
 
 | Folder | Covers |
 |---|---|
@@ -127,7 +130,7 @@ The modules are grouped in five folders under `skills/sole/`:
 
 Modules never define their own helpers. They call six shared agents, so the same researcher or reviewer behaves the same way in every task, and independent agents run in parallel.
 
-The **SessionStart hook** ([`hooks/load-context.sh`](hooks/load-context.sh)) runs when a session starts, resumes or is compacted. It prints the one-line routing hint and, if the project has a `.claude/CONTEXT.md`, its first 200 lines. Claude continues from that file's "Next" section instead of rereading the chat. The file is treated as notes, not commands, so a `CONTEXT.md` that arrives with someone else's repository cannot tell Claude what to do. A second hook ([`hooks/after-skill.sh`](hooks/after-skill.sh)) runs right after the router loads and reminds Claude to open the chapter before answering.
+The **SessionStart hook** ([`hooks/load-context.sh`](hooks/load-context.sh)) runs when a session starts, resumes or is compacted. It prints the one-line routing hint and, if the project has a `.claude/CONTEXT.md`, its first 200 lines. Claude continues from that file's "Next" section instead of rereading the chat. The file is treated as notes, not commands, so a `CONTEXT.md` that arrives with someone else's repository cannot tell Claude what to do. A second hook ([`hooks/after-skill.sh`](hooks/after-skill.sh)) runs right after a Sole skill loads, prints where the library is, and reminds Claude to open the chapter before answering.
 
 The **`sole-browser` plugin** ([`plugins/browser/`](plugins/browser)) starts Google's [Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp) server, pinned to version 1.13.0. It runs Chrome headless in a temporary profile that cannot see your logins, with Google's usage statistics and CrUX lookups turned off.
 

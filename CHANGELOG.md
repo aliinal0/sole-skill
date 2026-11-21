@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.1.0 - 2026-11-21 - five skills, lazy-senior coding
+
+Sole is now five skills that share one module library: `sole:code`, `sole:visual`, `sole:write`, `sole:business` and the general `sole:sole`. Each skill has its own description, so each area gets precise trigger words. A request loads only its own area's table: 433 to 555 words instead of the 822-word router, or 877 for `sole:code`, which carries its coding rules inline.
+
+Test results: 38 of 41 eval cases pass with Sole, 18 of 41 without. Cost per passing answer is $0.19 with Sole and $0.28 without (API list prices).
+
+- **`sole:code`**: works like a lazy senior developer.
+  - Before writing, it checks what the codebase, the standard library or an installed package already does. It adds no options, layers or dependencies nobody asked for.
+  - It leaves a small test or self-check for logic that can break and marks deliberate shortcuts with `shortcut:` comments.
+  - It ends its reply with what it did not check.
+- **`/sole:review`**: reviews a change or the whole repo. Findings are ranked by correctness, safety, load, tests, speed and lean code, and each one needs a concrete failing case. `shortcuts` lists the deferred work.
+- **Shared rules**:
+  - Every skill carries the same block: limits, facts, economy, finish.
+  - CI and `evals/run.py` fail if any copy differs.
+  - New economy rules for large models and high effort: stop exploring once you can act; read files in one batch; use subagents only for wide work; use the critic agent only for large deliverables or on request.
+- **Hooks**:
+  - The after-skill hook now prints the library's absolute path, so module paths resolve from any of the five skills.
+  - The session hint is shorter.
+- **Tests**:
+  - New cases `code-lean` and `code-review`.
+  - The runner checks every skill's description size and name.
+- Known trade-off: the five descriptions add about 2,200 characters to every session's always-loaded text.
+
 ## 1.0.0 - 2026-11-21 - first public release
 
 One adaptive Claude Code skill in place of many overlapping ones. A router (`SKILL.md`) loads only the module a request needs.

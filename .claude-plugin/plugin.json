@@ -1,10 +1,28 @@
 {
   "name": "sole",
-  "version": "1.0.0",
-  "description": "One adaptive skill instead of many: human-made UI/code/media, business (ads, ideas, competitors, SEO/GEO), research with agents and blocked-site fallback, humanized writing, lean token use and a project memory file.",
-  "author": { "name": "aliinal0" },
+  "version": "1.1.0",
+  "description": "Five adaptive skills on one shared module library: lean senior-style coding and code review, human-made UI/media/video, humanized writing, business (ads, ideas, competitors, SEO/GEO, pricing), research with agents and blocked-site fallback, lean token use and a project memory file.",
+  "author": {
+    "name": "aliinal0"
+  },
   "homepage": "https://github.com/aliinal0/sole-skill",
   "repository": "https://github.com/aliinal0/sole-skill",
   "license": "MIT",
-  "keywords": ["skills", "deslop", "humanizer", "design", "security", "code-map", "personas", "marketing", "seo", "geo", "research", "memory", "tokens"]
+  "keywords": [
+    "skills",
+    "deslop",
+    "humanizer",
+    "design",
+    "security",
+    "code-map",
+    "personas",
+    "marketing",
+    "seo",
+    "geo",
+    "research",
+    "memory",
+    "tokens",
+    "code-review",
+    "yagni"
+  ]
 }

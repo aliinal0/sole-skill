@@ -10,6 +10,17 @@ Most tokens are spent on **input** (files read, tool output, chat history), not 
 4. **Trim tool output.** Pipe long commands through `head`, `tail`, `grep`; ask for `--quiet` flags; never dump lockfiles, logs or minified files.
 5. **Do not re-read** a file you just wrote or edited.
 
+## Large models and high effort
+
+More effort should buy a better answer, not a longer search. The usual leaks and their fixes:
+
+- **Exploring past the point of acting.** Once you know where the change goes and what it touches, stop reading.
+- **Serial reads.** Plan the files you need, then read them in one message.
+- **Re-checking what a tool already confirmed.** A passing test or a clean grep is the answer; do not read the file again to be sure.
+- **Subagents for small jobs.** A subagent re-reads its own context; use one only for many files or pages, or for work that runs in parallel.
+- **Reviewing small work twice.** Self-check against the module; the `critic` agent is for large deliverables.
+- **Long replies.** Thinking can be long; the reply stays short. Put what you skipped or could not check in one line instead of a closing summary.
+
 ## Output side
 
 - Answer first: `[thing] [action] [reason]. [next step].`

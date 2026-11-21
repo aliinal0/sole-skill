@@ -16,15 +16,15 @@ Run on deliverables only (a UI, a document, a campaign, a feature). Skip for qui
 
 ## 3. AI-tell audit
 
-Launch the `critic` agent with the relevant list:
+Check the deliverable yourself against the relevant list. Launch the `critic` agent with it only for a large deliverable (a full page, a multi-file feature, a campaign) or when the user asked for a review:
 - UI -> `build/design/craft-floor.md`
 - Security-sensitive change -> a quick `build/security-audit.md` guidance pass on the diff
-- Code -> `build/deslop-code.md` table
+- Code -> `build/deslop-code.md` table, and `build/code-review.md` for logic, risk and missing tests
 - Images and thumbnails -> `build/deslop-media.md` list
 - Video -> `build/video/tells.md`, plus `scripts/video_check.py` on the render
 - Prose -> `write/humanize-text.md` patterns
 
-Fix what it finds. Do not present the critic's raw report unless the user asks.
+Fix what you find, unless the user said not to edit; then list it. Do not present a raw critic report unless the user asks.
 
 ## 4. Report honestly
 

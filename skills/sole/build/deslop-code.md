@@ -14,16 +14,12 @@ Before writing, read 1-2 neighbouring files and copy their conventions: naming, 
 | Over-abstraction: factory/manager/service for one call site | Inline it; abstract on the third use |
 | Defensive checks for impossible states, `try/except` around everything | Validate at the boundary, let real errors surface |
 | Generic names: `data`, `result`, `handleClick2`, `utils.ts` dumping ground | Names from the domain |
-| Unrequested features, config flags, "extensibility" | Build what was asked |
 | Every function documented with the same template docstring | Document public APIs; keep private code self-explanatory |
-| Re-implemented helpers the repo already has | Search first, reuse |
 | Huge single commit, message "Update files" | Small commits, imperative subject saying what and why |
 
 ## Writing new code
 
-- Smallest change that solves the problem. Do not refactor unrelated code.
-- Keep existing comments you were not asked to change.
-- READMEs and docs: use `write/docs-copy.md` and `write/humanize-text.md`.
+Follow the smallest-complete-change rules in the `sole:code` skill: reuse what the repo has, no unrequested features, flags or dependencies. READMEs and docs: `write/docs-copy.md` and `write/humanize-text.md`.
 
 ## Before handing over
 

@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: code-lean
+description: A small script request gets the code skill's smallest complete version - standard library, no unrequested features, a self-check - and a note on what was not checked.
+tags: [routing, code]
+runs: 1
+execution:
+  max_turns: 10
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Edit]
+  prompt: |
+    Write wordfreq.py: given the path of a text file on the command line, it prints the 10 most common words and how often each appears.
+graders:
+  - type: tool_used
+    name: code-skill-fired
+    tool: Skill
+    input_match: 'code'
+    min: 1
+    arm: with-only
+  - type: regex
+    name: uses-stdlib-counter
+    target: { source: file, path: wordfreq.py }
+    pattern: "Counter|most_common"
+  - type: regex
+    name: under-61-lines
+    target: { source: file, path: wordfreq.py }
+    pattern: "(?:[^\\n]*\\n){61}"
+    match: not_contains
+  - type: llm
+    name: small-complete-checked
+    focus: { source: file, path: wordfreq.py }
+    criteria: |
+      This is wordfreq.py. PASS if all of these hold: (a) it takes the file path from the command line and prints the 10 most
+      common words with their counts; (b) words are counted case-insensitively and punctuation is not counted as part of a
+      word; (c) it has no features nobody asked for: no classes, no logging setup, no config, no extra command-line options
+      (a plain sys.argv read or a minimal argparse with only the path is fine); (d) the file contains a small self-check of
+      the counting logic: assert lines (for example behind a --selftest flag or in a _selftest function) or a tiny test
+      function. Apostrophes inside words (don't, it's) may count as part of a word. FAIL otherwise.
