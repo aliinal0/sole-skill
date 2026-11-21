@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: geo-visibility
+description: 'An AI-search visibility question finds the blocked answer-engine crawlers, separates training from search bots, and notes JS-only prices - with no invented visibility score.'
+tags: [routing, business, seo, geo]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 12
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Why don't we show up when people ask ChatGPT or Perplexity for the best accounting software for Irish sole traders? Our robots.txt and pricing page are in this folder. Don't edit anything.
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'geo-agentic\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: quality
+    criteria: |
+      The files (you cannot see them): robots.txt blocks GPTBot, OAI-SearchBot and PerplexityBot from the whole site and
+      allows everything else. pricing.html puts its prices in only through JavaScript (plans.js fills an empty div), and under
+      the heading "Is Ledgerleaf right for Irish sole traders?" the first paragraph is filler; the concrete answer (Form 11,
+      Irish VAT rates, AIB and Bank of Ireland) comes second. OAI-SearchBot is the crawler for ChatGPT search and
+      PerplexityBot for Perplexity's search; GPTBot collects training data.
+      PASS if the reply (a) names the OAI-SearchBot and PerplexityBot blocks as the likely direct cause; (b) separates GPTBot
+      (training) from the search crawlers and treats blocking GPTBot as the owner's choice; (c) notes at least one of: prices
+      only appear after JavaScript runs, or the FAQ answer is not given first; and (d) does not invent an AI-visibility score,
+      citation rate or ranking data. FAIL otherwise.

@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: design-reference
+description: '"Make it feel like Linear" transposes principles instead of cloning the brand - no Linear palette, no Inter, grounded in the product.'
+tags: [routing, build, design]
+runs: 1
+execution:
+  max_turns: 10
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Design direction for the web dashboard of Burrow, our open-source log search tool. Make it feel like Linear. Plan only: palette, type, layout and one signature detail. No code.
+graders:
+  - type: tool_used
+    name: read-references
+    tool: Read
+    input_match: 'references\.md'
+    min: 1
+    arm: with-only
+  - type: regex
+    name: no-linear-accent
+    pattern: "5E6AD2"
+    flags: i
+    match: not_contains
+  - type: llm
+    name: transposed-not-cloned
+    criteria: |
+      Linear's own brand uses an indigo-violet accent (around #5E6AD2), a near-black background, the Inter typeface and the
+      Linear logo. The product here is Burrow, an open-source log search tool.
+      PASS if the plan names what it takes from Linear as principles (for example density, keyboard-first, restraint, one
+      rationed accent, precise type scale) rather than copying values; gives a palette with specific colour values whose
+      accent is not indigo or violet; uses a primary typeface other than Inter; grounds choices in log search (timestamps,
+      severity levels, monospace log lines, query bar); names one signature detail; and contains no code. FAIL otherwise.

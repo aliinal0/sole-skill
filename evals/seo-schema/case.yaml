@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: seo-schema
+description: An SEO schema review loads the SEO module and catches outdated (HowTo, FAQ rich results) and misleading (rating not on page) structured data.
+tags: [routing, business, seo]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 12
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Review the structured data (JSON-LD) in product.html for SEO. What should I change? Don't edit the file.
+graders:
+  - type: tool_used
+    name: read-seo-module
+    tool: Read
+    input_match: 'seo-geo\.md|schema\.md'
+    min: 1
+    arm: with-only
+  - type: regex
+    name: flags-howto
+    pattern: 'HowTo'
+  - type: llm
+    name: current-and-honest
+    criteria: |
+      PASS if the review (a) says HowTo no longer produces rich results (deprecated / removed in 2023) and should not be relied on,
+      (b) says FAQ rich results are no longer shown (or no longer worth adding for SERP features) instead of recommending FAQPage for rich results,
+      (c) flags that the AggregateRating (4.9 from 1,240 reviews) is not backed by any reviews visible on the page and must match visible content or be removed,
+      and (d) suggests keeping/fixing the Product + Offer markup (e.g. availability, missing fields). FAIL if it recommends adding HowTo or FAQ markup for rich results,
+      or misses the unsupported rating.

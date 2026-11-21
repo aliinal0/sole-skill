@@ -1,0 +1,40 @@
+schema_version: "1.1"
+name: voice-mimic
+description: '"Write in my voice" finds and follows .claude/VOICE.md - closing, punctuation, banned words - and keeps the facts exact.'
+tags: [routing, write, voice, english]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 8
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Write a short email in my voice to Priya: the March workshop moves from the 12th to the 19th because the venue double-booked us. Ask if the 19th still works for her.
+graders:
+  - type: tool_used
+    name: read-voice-profile
+    tool: Read
+    input_match: 'VOICE\.md'
+    min: 1
+  - type: regex
+    name: signs-off-as-dana
+    pattern: "Cheers,?\\s*Dana"
+  - type: regex
+    name: no-banned-words-or-marks
+    pattern: "!|excited|thrilled|reach out|circle back|inconvenience|—|–"
+    flags: i
+    match: not_contains
+  - type: llm
+    name: voice-and-facts
+    criteria: |
+      The user's stored voice profile says: short sentences (5-12 words), 1-2 sentence paragraphs, opens "Hi <name>," and gets
+      straight to the point, puts the ask in the second line, closes "Cheers, Dana", British spelling, no exclamation marks,
+      no emoji, no dashes, apologises at most once, often uses "a bit", "reckon", "sorted" and "shout if", never says "excited", "thrilled",
+      "reach out" or "circle back".
+      The facts to convey: the March workshop moves from the 12th to the 19th because the venue double-booked; ask Priya if
+      the 19th still works.
+      PASS if the email follows that profile and states those facts exactly, without inventing details (times, a new venue,
+      refunds, other attendees, reasons beyond the double booking). Using the profile's own phrases ("a bit", "sorted",
+      "shout if") is following the voice, not inventing; a hyphen inside a word such as "double-booked" is not a dash.
+      Short notes to the user outside the email are fine.
+      FAIL otherwise.

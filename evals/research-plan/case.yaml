@@ -1,0 +1,27 @@
+schema_version: "1.1"
+name: research-plan
+description: 'A multi-source research request gets a plan of narrow sub-questions with dependencies, a currency check and the deliverable shape, before any claims.'
+tags: [routing, research, deep-research]
+runs: 1
+execution:
+  max_turns: 8
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Research how the EU, UK and US rules on labelling AI-generated content differ, for a two-page brief to our marketing team. Show me the research plan first; don't search yet.
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'deep-research\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: quality
+    criteria: |
+      The user asked for a research plan only, no searching yet, on how EU, UK and US rules on labelling AI-generated
+      content differ, for a two-page brief to a marketing team.
+      PASS if the plan (a) splits the work into about 4-12 sub-questions, each narrow enough for 1-3 searches; (b) shows
+      which sub-questions depend on others or which can run in parallel; (c) says how it will check that the rules are
+      current (dated primary sources, effective dates), since these rules change; (d) describes the deliverable (summary
+      first, a comparison, sources); and (e) does not present findings as settled facts before searching (naming laws or
+      bodies to check is fine). FAIL otherwise.

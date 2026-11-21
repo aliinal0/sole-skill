@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: intent-vague
+description: '"Make me a website" gets one short round of decision questions (max 4, options and a recommendation) instead of code or a long questionnaire.'
+tags: [routing, core, intent]
+runs: 1
+execution:
+  max_turns: 8
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Make me a website.
+graders:
+  - type: tool_used
+    name: skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only
+  - type: llm
+    name: asks-well
+    criteria: |
+      The whole request was "Make me a website." with nothing else known.
+      PASS if the reply asks before building, asks at most 4 questions in this round, gives options or a recommended
+      default for each question, and produces no code, HTML or full design yet. FAIL if it writes code or a full page, asks
+      more than 4 questions, or asks open questions with no options or recommendation.

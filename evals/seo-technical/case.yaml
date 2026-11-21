@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: seo-technical
+description: 'A technical SEO check of a static export finds the planted crawl, canonical, sitemap and LCP problems and does not claim measurements it could not make.'
+tags: [routing, business, seo]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 16
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    This folder is a static export of our tea shop's website. Do a technical SEO check and tell me what to fix. Don't edit anything.
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'seo[\\/]+technical\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: quality
+    criteria: |
+      The export (you cannot see it) has these problems: (1) robots.txt has "Disallow: /products/", blocking every product
+      page; (2) robots.txt has no Sitemap line; (3) products/kettle.html has a canonical pointing to the homepage; (4)
+      kettle.html and teapot.html share the same title "Products | Steep & Co"; (5) sitemap.xml lists thank-you.html, which
+      is noindex; (6) every sitemap URL has the same lastmod 2026-11-20; (7) the homepage hero image (the likely LCP element)
+      has loading="lazy" (and an empty alt); (8) about.html has no viewport meta tag.
+      PASS if the reply finds at least 6 of the 8 with the file where each is, and does not claim measured Core Web Vitals,
+      LCP timings or a crawl of the live site (it only had files); if it gives a score, categories it could not check are
+      marked as not measured rather than scored. FAIL otherwise.

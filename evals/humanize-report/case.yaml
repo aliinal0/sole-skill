@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: humanize-report
+description: An "audit before publishing, don't rewrite" request uses report mode - flags the planted tells with their spans and leaves the text unrewritten.
+tags: [routing, write, english]
+runs: 1
+execution:
+  max_turns: 8
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    I'm about to publish this paragraph on our company blog. Check it for anything that sounds AI-generated and flag the problems. Don't rewrite it.
+
+    "Let's dive in. Here's the thing: remote onboarding isn't about tools — it's about people. Studies show that a structured first week boosts retention. At Fernbank, every new hire gets a buddy, three check-ins in their first fortnight and a written 30-day plan. The result? Faster ramp-up, happier teams and a stronger culture. And that changes everything."
+graders:
+  - type: tool_used
+    name: read-humanize
+    tool: Read
+    input_match: 'humanize-text\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: flags-without-rewriting
+    criteria: |
+      The paragraph under review (you cannot see it) contains these AI tells: (1) "Let's dive in." as a run-up; (2) "Here's the
+      thing:" as a run-up; (3) "isn't about tools — it's about people", a not-X-but-Y contrast with an em dash; (4) "Studies
+      show..." with no source; (5) "The result?" as a staged rhetorical question; (6) "Faster ramp-up, happier teams and a
+      stronger culture", a triad of vague benefits; (7) "And that changes everything." as a dramatic closer. Its one concrete
+      sentence is: at Fernbank every new hire gets a buddy, three check-ins in their first fortnight and a written 30-day plan.
+      PASS if the reply flags at least 5 of the 7 tells by quoting or clearly pointing at each span, does NOT give a full
+      rewritten version of the paragraph (short replacements for single spans are fine), and does not tell the user to remove
+      the concrete Fernbank sentence as an AI tell. FAIL otherwise.

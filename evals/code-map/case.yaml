@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: code-map
+description: '"Map this codebase" writes a short .claude/CODEMAP.md with the real entry points, modules and data flow, linking files instead of pasting code.'
+tags: [routing, build, code-map]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 20
+  allowed_tools: [Skill, Read, Glob, Grep, Write]
+  prompt: |
+    Map this codebase so future sessions don't have to re-read it.
+graders:
+  - type: tool_used
+    name: read-code-map-module
+    tool: Read
+    input_match: 'code-map\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: accurate-map
+    focus: trace
+    arm: with-only
+    criteria: |
+      This is the agent's trace. The test sandbox denies writes inside .claude/, so judge the code map the agent TRIED to
+      write to .claude/CODEMAP.md in its Write tool call (a denied write is fine; no attempt to write a map file is FAIL).
+      The repo (you cannot see it) is parcelpost-api: Express API started by src/server.js, and a BullMQ queue worker
+      started by src/jobs/worker.js (two entry points). POST /shipments (src/routes/shipments.js) prices the parcel with
+      src/services/pricing.js quote(weightKg, zone), inserts it with src/db/index.js (Postgres via pg) and queues a "label"
+      job (src/queue.js); the worker generates the label with src/services/labels.js and saves its URL with attachLabel.
+      POST /webhooks/stripe (src/routes/webhooks.js) verifies the Stripe signature and marks the shipment paid. Tests use
+      node --test in test/.
+      PASS if that map names both entry points, the main modules with their job, the shipment data flow including the queue
+      and the Stripe webhook, and the stack (Express, Postgres, Stripe, BullMQ/Redis); states nothing that contradicts the
+      facts above; links file paths instead of pasting code blocks longer than a few lines; and is under about 150 lines.
+      FAIL otherwise.

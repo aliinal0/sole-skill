@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: ideation-growth
+description: 'Growth ideas for a small bike shop are specific to the business, scored on explicit criteria, and the top ones come with a cheap test and a go/stop metric.'
+tags: [routing, business, ideation]
+runs: 1
+execution:
+  max_turns: 10
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    I run a two-person bike repair shop in Leeds. Weekday mornings are dead. Give me ideas to fill them; budget under £500.
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'ideation\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: quality
+    criteria: |
+      The request: a two-person bike repair shop in Leeds wants to fill dead weekday mornings, budget under £500.
+      PASS if the ideas are specific to a bike repair shop and to weekday mornings (not generic small-business tips such as
+      "post on social media" or "run a loyalty card" as the main ideas); the ideas are scored or ranked on explicit criteria
+      (for example pain, reach, feasibility, differentiation, cost to test); the top ideas each have a cheapest first test and
+      a go/stop metric; everything fits within £500; and no local statistics are invented and stated as fact (e.g. "Leeds has
+      40,000 cycle commuters"). FAIL otherwise.

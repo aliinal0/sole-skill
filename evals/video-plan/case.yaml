@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: video-plan
+description: Planning a talking-head edit from a word-level transcript keeps natural breath and the laugh, cuts the retake, and avoids default AI-edit effects.
+tags: [routing, build, video]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 12
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    transcript.json is the word-level transcript of my one-take talking-head video for YouTube (16:9), just under a minute long.
+    Plan the edit: what to cut, captions, B-roll, music and effects. Do not render anything, just give me the plan.
+graders:
+  - type: tool_used
+    name: read-video-module
+    tool: Read
+    input_match: 'video.{1,2}edit\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: human-edit-plan
+    criteria: |
+      PASS only if the plan does all of these: (a) cuts the false start and its restart cue ("Wait, wait, let me start that
+      again" and the first, abandoned version of the sentence); (b) shortens the ~3 s dead-air gap but keeps natural pauses
+      as breath: trimming other long gaps a little is fine, removing every pause so the speech runs together is not;
+      (c) keeps the laugh and the "Three weeks." beat; (d) does not
+      prescribe these as defaults: a zoom or punch-in on every cut, a whoosh or swoosh sound on every cut, word-by-word or
+      all-caps animated captions, or stock B-roll for most sentences; (e) asks the user to confirm the plan or names the
+      style choices (captions, music) it assumed. FAIL if any of (a)-(e) is missing.

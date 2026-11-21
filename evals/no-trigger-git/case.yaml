@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: no-trigger-git
+description: A quick git question must not load the skill.
+tags: [routing, negative]
+runs: 1
+execution:
+  max_turns: 3
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    What's the git command to undo my last commit but keep its changes staged?
+graders:
+  - type: tool_used
+    name: skill-not-fired
+    tool: Skill
+    min: 0
+    max: 0
+  - type: regex
+    name: correct-command
+    pattern: "reset --soft HEAD(~1|\\^|~)"

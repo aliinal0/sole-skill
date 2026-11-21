@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: no-trigger-code
+description: A one-line Python question must not load the skill.
+tags: [routing, negative]
+runs: 1
+execution:
+  max_turns: 3
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    In Python, why does `for i in range(len(xs) - 1)` skip the last element? One line.
+graders:
+  - type: tool_used
+    name: skill-not-fired
+    tool: Skill
+    min: 0
+    max: 0
+  - type: regex
+    name: mentions-exclusive-end
+    pattern: "exclusive|excludes|stops before|up to but not|not included|len\\(xs\\) ?- ?2"
+    flags: i

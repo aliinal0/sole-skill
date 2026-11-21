@@ -1,0 +1,29 @@
+{
+  "description": "Sole: routing hint plus the project memory file (.claude/CONTEXT.md) at session start and after compaction; a read-the-module reminder right after the Sole skill loads",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/load-context.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/after-skill.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

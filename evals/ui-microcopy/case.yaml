@@ -1,0 +1,32 @@
+schema_version: "1.1"
+name: ui-microcopy
+description: UI strings for a payment form - action buttons, errors that say what happened and what to do, an empty state with a first action, no "Oops".
+tags: [routing, write, copy, english]
+runs: 1
+execution:
+  max_turns: 8
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Write the UI text for the payment form in our invoicing app, Billow: the pay button (the form shows the invoice total), the error when the card is declined, the error when the connection drops mid-payment, and the empty state of the Payments list before any payment exists. Just the strings.
+graders:
+  - type: tool_used
+    name: read-docs-copy
+    tool: Read
+    input_match: 'docs-copy\.md'
+    min: 1
+    arm: with-only
+  - type: regex
+    name: no-oops
+    pattern: "oops|uh-oh|whoops|something went wrong"
+    flags: i
+    match: not_contains
+  - type: llm
+    name: microcopy-quality
+    criteria: |
+      The strings are for a payment form in an invoicing app: a pay button (the invoice total is shown), a card-declined
+      error, an error when the connection drops mid-payment, and the empty state of the Payments list.
+      PASS if: the button names the action (e.g. "Pay £240.00" or "Pay invoice", not "Submit", "Continue" or "OK"); the
+      declined error says what happened and what to do next without blaming the user or apologising; the connection error
+      does not claim for certain that the user was or was not charged (the app cannot know once the connection dropped) and
+      tells them how to check before retrying; the empty state says what the list is for and gives a first action; no emoji
+      and no exclamation marks. FAIL otherwise.

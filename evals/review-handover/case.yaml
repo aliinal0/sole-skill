@@ -1,0 +1,29 @@
+schema_version: "1.1"
+name: review-handover
+description: A pre-handover review checks the deliverable against the brief, finds the planted mismatches and leftovers, and says what it did not verify.
+tags: [routing, build, review]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 12
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    I'm about to send landing.html to the client. Do a final check against brief.md before I hand it over. Don't edit anything.
+graders:
+  - type: tool_used
+    name: read-review-module
+    tool: Read
+    input_match: 'review\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: finds-mismatches-reports-honestly
+    criteria: |
+      The files (you cannot see them) contain these problems: (1) the headline says free delivery over £35, the brief says
+      £40; (2) the phone number is 0117 496 0132, the brief says 0117 496 0123; (3) hours say Tue–Sun, the brief says
+      Tue-Sat; (4) the image is an Unsplash stock photo, the brief says real photos only; (5) the order button links to "#"
+      instead of https://order.hearthandcrumb.co.uk; (6) a leftover console.log("debug: hero loaded"); (7) "Unlock the taste
+      of..." slogan copy with an em dash; (8) the image has no alt text.
+      PASS if the review finds at least 6 of the 8 with where they are, and says what it did not check (for example that
+      it did not open the page in a browser or on a phone). FAIL otherwise.

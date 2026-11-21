@@ -1,0 +1,44 @@
+schema_version: "1.1"
+name: readme-write
+description: A README written from the real code - one-line purpose, quick start, only the flags that exist, no marketing adjectives or emoji headings.
+tags: [routing, write, docs, english]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 12
+  allowed_tools: [Skill, Read, Glob, Grep, Write]
+  prompt: |
+    Write a README.md for this project.
+graders:
+  - type: tool_used
+    name: read-docs-copy
+    tool: Read
+    input_match: 'docs-copy\.md'
+    min: 1
+    arm: with-only
+  - type: file_exists
+    name: readme-created
+    path: README.md
+  - type: regex
+    name: no-marketing
+    target: { source: file, path: README.md }
+    pattern: "🚀|✨|blazing|powerful|seamless|effortless|lightning"
+    flags: i
+    match: not_contains
+  - type: regex
+    name: real-flags
+    target: { source: file, path: README.md }
+    pattern: "--dedupe[\\s\\S]*--trim|--trim[\\s\\S]*--dedupe"
+  - type: llm
+    name: accurate-readme
+    focus: { source: file, path: README.md }
+    criteria: |
+      The project (you cannot see it) is csvtidy 0.3.1, a Node.js (>=18) command-line tool that cleans CSV files. It takes
+      exactly one input file path (stdin is NOT supported) and has only these options: --trim (trim whitespace in cells),
+      --dedupe (drop duplicate rows), --delimiter <char> (default ","), --out <file> (write to a file instead of stdout),
+      --help / -h. It skips blank lines, and exits with status 2 unless exactly one input file is given. Licence: MIT.
+      PASS if the README opens with one line saying what it is and who it is for, has a quick start that would work, shows
+      usage examples using only the real options, does not invent options or features (no stdin/pipe support, no --json,
+      --sort, --columns, config files, GUI or Windows installer), has no marketing adjectives or emoji headings, and names
+      the MIT licence. FAIL otherwise.

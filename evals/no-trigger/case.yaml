@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: no-trigger
+description: A trivial question must not load the skill (no wasted tokens).
+tags: [routing, negative]
+runs: 1
+execution:
+  max_turns: 3
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    What is 17 multiplied by 23?
+graders:
+  - type: tool_used
+    name: skill-not-fired
+    tool: Skill
+    min: 0
+    max: 0
+  - type: regex
+    name: correct-answer
+    pattern: "391"

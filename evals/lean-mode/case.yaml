@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: lean-mode
+description: /sole:lean turns on terse answers that keep the facts, negations and code intact.
+tags: [core, lean, command]
+runs: 1
+execution:
+  max_turns: 6
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    /sole:lean Then answer: why does my React useEffect run twice in development?
+graders:
+  - type: tool_used
+    name: read-economy
+    tool: Read
+    input_match: 'token-economy\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: terse-and-correct
+    arm: with-only
+    criteria: |
+      Lean mode was switched on, then the user asked why their React useEffect runs twice in development.
+      PASS if the answer is terse (roughly 80 words of prose or fewer, code not counted), has no greeting, recap or
+      sign-off (a few-word confirmation that lean mode is on is fine), and is correct: React StrictMode in development mounts, unmounts and remounts components to expose effects
+      without proper cleanup; it does not happen in production builds; the fix is a cleanup function or an idempotent
+      effect rather than removing StrictMode. FAIL otherwise.

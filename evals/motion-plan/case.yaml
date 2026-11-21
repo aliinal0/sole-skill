@@ -1,0 +1,27 @@
+schema_version: "1.1"
+name: motion-plan
+description: A 20-second launch-film storyboard avoids invented stats, page chrome, slogan copy and a long web-footer ending, and shows the product doing the thing.
+tags: [build, video, motion]
+runs: 1
+execution:
+  max_turns: 10
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Storyboard a 20-second launch video for Ledgerly, a bookkeeping app for freelancers (invoices, expenses, quarterly tax
+    estimates). Give me the beats with timings, what is on screen and the on-screen copy. No code, just the storyboard.
+graders:
+  - type: tool_used
+    name: read-motion-module
+    tool: Read
+    input_match: 'video.{1,2}motion\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: directed-not-generic
+    criteria: |
+      PASS only if the storyboard (a) contains no invented statistics or user counts presented as real (e.g. "10,000 freelancers",
+      "save 5 hours a week") unless clearly marked as placeholders to replace, (b) has no corner labels, scene counters
+      ("01 / 04") or progress-bar chrome, (c) avoids slogan formulas such as "Not just X. It's Y.", "Unlock", "Meet Ledgerly",
+      "the future of", (d) shows the product performing a specific task with real-looking content (an invoice, an expense,
+      a tax estimate) rather than describing features, and (e) ends without a long logo + tagline + button + URL card held
+      for more than about 2 seconds. FAIL if any of (a)-(e) is violated.

@@ -1,0 +1,36 @@
+name: Bug or wrong result
+description: Sole gave a wrong, generic or broken result, or something failed to run.
+labels: [bug]
+body:
+  - type: textarea
+    id: prompt
+    attributes:
+      label: What you asked
+      description: The prompt or command you used (remove anything private).
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened
+      description: The output, error or behaviour you saw.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Sole version (see CHANGELOG), Claude Code version (`claude --version`), OS.
+    validations:
+      required: true
+  - type: textarea
+    id: other-skills
+    attributes:
+      label: Other installed skills or plugins
+      description: Overlapping skills often cause conflicts; list what else is installed.

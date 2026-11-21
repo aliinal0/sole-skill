@@ -1,0 +1,27 @@
+schema_version: "1.1"
+name: learn-explain
+description: 'Explaining CORS vs CSRF to a frontend dev: big picture, concrete examples, the named confusion, correct facts, and a check question.'
+tags: [routing, research, learn]
+runs: 1
+execution:
+  max_turns: 10
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    I'm a frontend dev and I keep mixing up CORS and CSRF. Explain them so it finally sticks.
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'learn\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: quality
+    criteria: |
+      PASS if the explanation (a) starts with the big picture briefly; (b) gives one concrete example from frontend work
+      for each (e.g. a fetch from app.example.com to api.example.com that the browser will not let the page read; a malicious
+      site making the user's browser submit a form to their bank with the bank's cookies attached); (c) names why people mix
+      them up and the key difference: CORS is a server opting in to let other origins read responses, relaxing the
+      same-origin policy; CSRF is an attack that abuses the browser sending cookies automatically; (d) is technically
+      correct, in particular it does not claim that CORS settings protect against CSRF (a plain cross-site form POST needs no
+      CORS at all); (e) ends with a short check question, tiny exercise or the next thing to learn. FAIL otherwise.

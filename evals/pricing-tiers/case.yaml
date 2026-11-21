@@ -1,0 +1,27 @@
+schema_version: "1.1"
+name: pricing-tiers
+description: 'B2B pricing tiers use a value metric that grows with the customer and is predictable, anchor against the given alternative, and say how to validate.'
+tags: [routing, business, pricing]
+runs: 1
+execution:
+  max_turns: 10
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    We're launching Sendwell, a tool that schedules and tracks onboarding emails for SaaS companies. Our customers get 200 to 5,000 new signups a month; usually 1-3 people at each customer touch onboarding. The usual alternative is Customer.io, which starts at $100/month. Propose our pricing tiers.
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'positioning-pricing\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: quality
+    criteria: |
+      Facts given: Sendwell schedules and tracks onboarding emails for SaaS companies; customers get 200-5,000 new
+      signups a month; 1-3 people per customer use it; the usual alternative, Customer.io, starts at $100/month.
+      PASS if the proposal (a) has three tiers with the middle one as the intended pick; (b) charges on a value metric that
+      grows with the customer's value and that they can predict (e.g. new signups or onboarded users per month), not per
+      seat; (c) sets price levels with reasoning against the $100/month alternative, with no B2B tier at $9 or less; (d) says
+      how to validate the prices (willingness-to-pay interviews, Van Westendorp or similar); (e) does not state other
+      competitors' prices or market statistics as current fact without saying they need checking. FAIL otherwise.

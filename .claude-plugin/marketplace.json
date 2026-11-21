@@ -1,0 +1,21 @@
+{
+  "name": "sole-skill",
+  "owner": {
+    "name": "aliinal0"
+  },
+  "metadata": {
+    "description": "Marketplace for the Sole plugin"
+  },
+  "plugins": [
+    {
+      "name": "sole",
+      "source": "./",
+      "description": "One adaptive skill that routes Claude to the right mode for coding, business and research work."
+    },
+    {
+      "name": "sole-browser",
+      "source": "./plugins/browser",
+      "description": "Optional: Chrome DevTools MCP (pinned, isolated, headless, telemetry off) for real-browser checks."
+    }
+  ]
+}

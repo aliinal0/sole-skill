@@ -1,0 +1,52 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Validate plugins
+        run: |
+          claude plugin validate .
+          claude plugin validate plugins/browser
+
+      - name: Check JSON, YAML, shell and Python files
+        run: |
+          pip install --quiet pyyaml
+          python3 - <<'PY'
+          import glob, json, yaml
+          for f in glob.glob('**/*.json', recursive=True) + glob.glob('.claude-plugin/*.json') + ['plugins/browser/.mcp.json']:
+              json.load(open(f, encoding='utf-8'))
+          for f in glob.glob('evals/*/case.yaml') + glob.glob('.github/**/*.yml', recursive=True):
+              yaml.safe_load(open(f, encoding='utf-8'))
+          print('json/yaml ok')
+          PY
+          for f in hooks/*.sh evals/*/scaffold.sh; do bash -n "$f"; done
+          python3 -m py_compile skills/sole/scripts/fetch.py skills/sole/scripts/video_check.py
+
+      - name: Script unit tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Check module links
+        run: |
+          missing=0
+          for f in $(grep -rhoE '`(core|build|business|research|write|templates|scripts)/[A-Za-z/._-]+\.(md|py)`' --include=*.md --exclude=personas.md skills commands agents | tr -d '`' | sort -u); do
+            [ -f "skills/sole/$f" ] || { echo "missing: $f"; missing=1; }
+          done
+          exit $missing

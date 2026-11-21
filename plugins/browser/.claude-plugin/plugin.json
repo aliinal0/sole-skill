@@ -1,0 +1,10 @@
+{
+  "name": "sole-browser",
+  "version": "1.0.0",
+  "description": "Optional add-on for Sole: Chrome DevTools MCP (pinned 1.13.0) in an isolated, headless browser with Google usage statistics and CrUX lookups turned off. Enables render checks, accessibility, performance traces and rendered SEO data.",
+  "author": { "name": "aliinal0" },
+  "homepage": "https://github.com/aliinal0/sole-skill",
+  "repository": "https://github.com/aliinal0/sole-skill",
+  "license": "MIT",
+  "keywords": ["browser", "chrome-devtools", "mcp", "performance", "accessibility"]
+}

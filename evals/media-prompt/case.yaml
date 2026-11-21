@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: media-prompt
+description: An image-generator prompt for a bakery hero is specific (materials, light, lens), leaves room for the headline, renders no text and skips quality-booster tags.
+tags: [routing, build, media]
+runs: 1
+execution:
+  max_turns: 8
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Write a prompt for an image generator: the hero image for the website of Hearth & Crumb, a two-person sourdough bakery in Bristol. The headline "Baked before sunrise" will sit over the left side of the image.
+graders:
+  - type: tool_used
+    name: read-deslop-media
+    tool: Read
+    input_match: 'deslop-media\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: human-made-prompt
+    criteria: |
+      The request: an image-generator prompt for the website hero of Hearth & Crumb, a two-person sourdough bakery in
+      Bristol; the headline "Baked before sunrise" will be placed over the left side later.
+      Judge the prompt text meant for the generator. PASS if it describes one specific scene with real materials and light
+      that fit early-morning baking (e.g. flour on a wooden bench, a steel deck oven, low warm light, a dark window), real
+      imperfections, a camera or lens choice, and quiet empty space on the left for the headline; it does NOT ask the
+      generator to render the headline or any other text, signage or logo; it does NOT use generic quality boosters ("8k",
+      "ultra-detailed", "hyperrealistic", "masterpiece", "trending on ArtStation", "award-winning") or default looks (heavy
+      bokeh, lens flares, a teal-orange colour grade); and it invents nothing about the bakery beyond the facts given (no founder
+      names, founding year or products not mentioned). Mentioning such words only as things to avoid, outside the prompt
+      itself, is fine. Warm and cool light that comes from real sources in the scene (an oven, a window before dawn) is
+      lighting, not a colour grade. FAIL otherwise.

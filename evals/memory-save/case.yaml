@@ -1,0 +1,33 @@
+schema_version: "1.1"
+name: memory-save
+description: Saving a decision to project memory updates .claude/CONTEXT.md in place - dated decision, next step replaced - and never stores the password.
+tags: [routing, core, memory]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 10
+  allowed_tools: [Skill, Read, Glob, Grep, Edit, Write]
+  prompt: |
+    Save this to the project memory: today (2026-11-18) we picked Postgres over MongoDB because of the reporting queries. Next step is writing the migration for the orders table. The staging database password is hunter2-staging, but don't store that anywhere.
+graders:
+  - type: tool_used
+    name: read-memory-module
+    tool: Read
+    input_match: 'context-memory\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: clean-update
+    focus: trace
+    criteria: |
+      This is the agent's trace. The test sandbox denies writes inside .claude/, so judge the content the agent TRIED to
+      write to .claude/CONTEXT.md in its Write or Edit tool calls (a denied write is fine; no write attempt at all is FAIL).
+      Before, the file had: Goal (orders service for the Steep & Co shop), Preferences (short answers), Decisions (REST,
+      not GraphQL - 2026-11-12), Done (order model and API skeleton - 2026-11-14), Next (1. Pick a database). The user
+      said: on 2026-11-18 we picked Postgres over MongoDB because of the reporting queries; next step is the migration for
+      the orders table; the staging password (hunter2-staging, given in the user's message) must not be stored.
+      PASS if the attempted content records the Postgres decision with its date and reason, no longer lists "Pick a
+      database" as an open next step, makes the migration the next step, keeps the earlier Goal, Preferences, Decisions
+      and Done entries, holds facts rather than a chat transcript, and contains no password in any Write or Edit input.
+      The password appearing in the user's own message is not a failure. FAIL otherwise.

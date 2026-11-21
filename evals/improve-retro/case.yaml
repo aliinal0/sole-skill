@@ -1,0 +1,34 @@
+schema_version: "1.1"
+name: improve-retro
+description: A "fix my setup" retrospective finds the CLAUDE.md lines that cause the friction, proposes removals first, and changes nothing before the user picks.
+tags: [routing, core, improve]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 14
+  allowed_tools: [Skill, Read, Glob, Grep, Edit, Write]
+  prompt: |
+    You keep running yarn even though this project uses npm, and you keep looking for tests in /spec. Fix my setup so this stops.
+graders:
+  - type: tool_used
+    name: read-improve-module
+    tool: Read
+    input_match: 'improve-system\.md'
+    min: 1
+    arm: with-only
+  - type: regex
+    name: nothing-changed-before-picking
+    target: { source: file, path: CLAUDE.md }
+    pattern: "Install: `yarn install`"
+    arm: with-only
+  - type: llm
+    name: finds-the-cause
+    criteria: |
+      The project's CLAUDE.md (you cannot see it) says "Install: `yarn install`" and "Run tests: `yarn test`" and also
+      "Always use npm, never yarn."; it says "Tests live in /spec" while the tests are really in tests/ (there is no spec
+      folder); it repeats the 2-space indentation rule twice; and it has an old History section. The repo uses npm
+      (package-lock.json).
+      PASS if the reply identifies that CLAUDE.md itself causes both problems (the yarn commands contradict the npm rule;
+      /spec is wrong, tests are in tests/), fixes them by removing or correcting the wrong lines rather than only adding
+      another rule on top, and notices the duplicated indentation rule. FAIL otherwise.

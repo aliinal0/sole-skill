@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: video-review
+description: Reviewing an AI-style edit plan names the planted tells (even rhythm, punch-ins, whooshes, word captions, stock B-roll, flat music, LUT, generic hook) with concrete fixes.
+tags: [build, video]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 12
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Before I render, review my edit: edit_notes.md and edl.json. What would make viewers think it was edited by AI,
+    and what should I change? Keep it practical.
+graders:
+  - type: tool_used
+    name: read-video-tells
+    tool: Read
+    input_match: 'video.{1,2}tells\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: finds-tells-with-fixes
+    criteria: |
+      PASS only if the review (a) points out that the cuts in edl.json come at a fixed ~1.5-1.6 s interval and recommends
+      varying shot length with the content, (b) names at least five of these and gives a concrete fix for each: every pause
+      removed, punch-in on every cut, whoosh on every cut, one-word uppercase captions with emoji, stock B-roll for every
+      sentence, one flat music level for the whole video, heavy teal-orange LUT, the generic "What if I told you" hook;
+      and (c) does not invent problems that are not in the files. FAIL otherwise.
+      Facts in the files (you cannot see them, so trust these): edl.json has 24 shots of talk.mp4, each exactly 1.5 s, and
+      each shot starts 0.12 s after the previous one ends in the source; every shot has a 120% punch-in and a whoosh.
+      edit_notes.md says a silence remover removed every pause and the music sits at -6 dB under the voice for the whole
+      video. No footage or transcript is given. Reading the 0.12 s gaps as the removed pauses, or noting that perfectly
+      even gaps do not look like a silence remover's output, are both fair. Citing general reference numbers (shot-length
+      variation in human-edited films, loudness targets) is not an invented problem. A consequence the files suggest but
+      cannot show (cuts on a timer may land mid-word) is fine when framed as a risk to check; stated as a certain fact
+      about the footage it counts as invented.

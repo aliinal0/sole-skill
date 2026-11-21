@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: video-user-style
+description: When the user explicitly asks for the loud short-form style (word-by-word captions, punch-ins, pop effects), the plan delivers it instead of overriding it with Sole's defaults.
+tags: [build, video, user-preference]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 12
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    transcript.json is my talking-head take. I'm cutting it for TikTok (9:16) and I want the Hormozi style on purpose:
+    word-by-word bold captions, a punch-in on most sentences, and pop sound effects on key words. Plan the edit, no render.
+graders:
+  - type: llm
+    name: follows-requested-style
+    criteria: |
+      PASS only if the plan (a) uses word-by-word (or one-to-three-word) bold captions as asked, (b) puts a punch-in or zoom
+      on more than half of the spoken lines (leaving the laugh or a few lines at 100% is fine), (c) adds pop sound effects on
+      key words as asked, (d) still cuts the false start ("Wait, wait, let me start that again" and the abandoned first
+      sentence), and (e) does not replace the requested style or argue the user out of it; short technical notes (safe zones,
+      crop quality, level of the effects) are fine. FAIL only if one of the requested elements is missing or swapped for a
+      calmer default.

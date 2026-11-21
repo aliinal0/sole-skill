@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: business-routing
+description: A competitor + SEO request combines the right business modules and does not load build modules.
+tags: [routing, business]
+runs: 1
+execution:
+  max_turns: 12
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    I run a UK online cooking-class startup. Before you fetch anything, give me a short plan for analysing our three biggest competitors and their SEO, including how we show up in AI search answers. Plan only, no web requests yet.
+graders:
+  - type: tool_used
+    name: read-competitor
+    tool: Read
+    input_match: 'competitor\.md'
+    min: 1
+    arm: with-only
+  - type: tool_used
+    name: read-seo-geo
+    tool: Read
+    input_match: 'seo-geo\.md'
+    min: 1
+    arm: with-only
+  - type: tool_used
+    name: no-build-modules
+    tool: Read
+    input_match: 'build[\\/]+'
+    min: 0
+    max: 0
+    arm: with-only
+  - type: llm
+    name: plan-quality
+    criteria: |
+      PASS if the plan covers: choosing or confirming the competitors, per-competitor data (positioning or messaging, pricing
+      or offer, reviews, SEO footprint), an AI-search/GEO visibility check, a comparison/synthesis step, and concrete next
+      moves. Ads are optional because the question does not ask about them. FAIL if it is generic or misses GEO.

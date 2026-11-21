@@ -1,0 +1,34 @@
+schema_version: "1.1"
+name: ads-copy
+description: 'Meta install ads are built by angle with hook, text, headline, CTA and creative, use only the given facts, and come with a test plan.'
+tags: [routing, business, ads]
+runs: 1
+execution:
+  max_turns: 10
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Write Meta ads for Loopwell, a free UK app that turns your daily step count into donations to local food banks; partner brands pay for the donations. Since launching in May we've raised £12,400. Goal: app installs.
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'ads\.md'
+    min: 1
+    arm: with-only
+  - type: regex
+    name: no-slogan-words
+    pattern: "unlock|elevate|seamless|game-?changer|revolutioni[sz]e|empower"
+    flags: i
+    match: not_contains
+  - type: llm
+    name: quality
+    criteria: |
+      The only facts given: Loopwell is a free UK app; your daily step count becomes donations to local food banks;
+      partner brands pay for the donations; since launching in May it has raised £12,400; the goal is app installs on Meta.
+      PASS if the reply (a) gives at least 3 clearly different angles, each with a hook, primary text, headline, CTA and a
+      creative idea; (b) uses only the facts above - no invented numbers of users, meals, food banks, steps-per-pound rates,
+      ratings, testimonials, partner or celebrity names presented as real (clearly marked placeholders like [partner name]
+      are fine; an example value shown inside a mocked-up app screen in a creative idea, such as a step counter, is
+      illustration, not a claim); (c) includes a test plan with a budget split or structure and the metric that decides (cost per install or
+      similar); (d) avoids AI slogan words ("unlock", "elevate", "seamless", "game-changer", "revolutionise", "empower").
+      FAIL otherwise.

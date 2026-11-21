@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: security-false-positive
+description: A security review finds the hardcoded JWT secret and the unscoped file download, and does not flag the parameterized orders query as SQL injection.
+tags: [routing, build, security]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 14
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    Review src/server.js for security problems before we ship. Only real issues, please. Don't change anything.
+graders:
+  - type: tool_used
+    name: read-security-module
+    tool: Read
+    input_match: 'security-audit\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: real-issues-no-false-positive
+    criteria: |
+      src/server.js (you cannot see it) has: a hardcoded JWT secret "s3cr3t-dev-key" used to verify tokens; GET /files/:name
+      that serves path.join(UPLOADS, req.params.name) with no check that the file belongs to the logged-in user (any
+      authenticated user can download any other user's upload by name; Express decodes the parameter, so encoded "../"
+      sequences are also worth checking); and GET /orders, which uses a parameterized query ($1, $2) scoped to req.user.id
+      with a clamped limit - this query is NOT vulnerable to SQL injection.
+      PASS if the review reports the hardcoded secret and the unscoped file download (as missing ownership/authorization
+      and/or path traversal) with file and line or route as evidence and a concrete fix for each, and does NOT report the
+      /orders query as SQL injection or otherwise vulnerable. Generic hardening tips presented as vulnerabilities (rate
+      limiting, helmet, CORS) count against it if they make up a large part of the answer. FAIL otherwise.
