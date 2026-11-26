@@ -26,7 +26,7 @@ If unclear which, ask one question.
 ## Phase 2 - Code review (OWASP Top 10 lens)
 
 Map entry points first (routes, handlers, CLI args, file/queue consumers, webhooks). For each, follow untrusted input to sinks:
-- Broken access control / IDOR: is ownership checked on every object read/write?
+- Broken access control / IDOR: is ownership checked on every object read/write? A route that serves an object by name or id with no owner check is a finding, not a "needs checking" note, when its neighbours scope by user.
 - Injection: SQL/NoSQL/OS command/template/LDAP built from input; path traversal; SSRF from user-supplied URLs.
 - Auth and sessions: password storage (bcrypt/argon2), token expiry and rotation, JWT `alg`/secret handling, CSRF on cookie auth, rate limiting on login/reset.
 - XSS: unescaped output, `dangerouslySetInnerHTML`/`v-html`/`innerHTML`, markdown rendering.

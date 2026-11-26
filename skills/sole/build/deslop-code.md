@@ -13,6 +13,7 @@ Before writing, read 1-2 neighbouring files and copy their conventions: naming, 
 | Banner comments, emoji in logs, `✅ Success!` prints | Plain, quiet logs at the right level |
 | Over-abstraction: factory/manager/service for one call site | Inline it; abstract on the third use |
 | Defensive checks for impossible states, `try/except` around everything | Validate at the boundary, let real errors surface |
+| A new comment added while cleaning up | Clean-up only removes comments; keep a *why* that was already there |
 | Generic names: `data`, `result`, `handleClick2`, `utils.ts` dumping ground | Names from the domain |
 | Every function documented with the same template docstring | Document public APIs; keep private code self-explanatory |
 | Huge single commit, message "Update files" | Small commits, imperative subject saying what and why |

@@ -36,7 +36,7 @@ Launch the `strategist` agent (or score yourself) on each idea, 1-5:
 
 For each: one-line pitch, who it is for, the riskiest assumption, the cheapest test of that assumption (landing page, interviews, concierge MVP, ad test), and the metric that says go/stop, with a number ("5 morning drop-offs a week by week 4, or stop").
 
-The answer always shows the score table from step 4 (short is fine) and the top 3 in this shape. A list of ideas without scores or go/stop numbers is not finished.
+Add up the totals and sort the table by them. The answer always shows the score table from step 4 (short is fine) and the top 3 in this shape. A list of ideas without scores or go/stop numbers is not finished.
 
 ## Growth idea bank (pick by stage and budget)
 

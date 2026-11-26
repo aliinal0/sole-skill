@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Remove AI tells from a UI, code, media plan or text
 argument-hint: "[path, URL or pasted text]"
 ---

@@ -1,0 +1,34 @@
+schema_version: "1.1"
+name: cmd-voice
+description: The voice slash command loads its module and does the job (reuses the voice-mimic scenario).
+tags: [command]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 14
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    /sole:voice Write a short email in my voice to Priya: the March workshop moves from the 12th to the 19th because the venue double-booked us. Ask if the 19th still works for her.
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'humanize-text\.md|VOICE\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: voice-and-facts
+    criteria: |
+      The user's stored voice profile says: short sentences (5-12 words), 1-2 sentence paragraphs, opens "Hi <name>," and gets
+      straight to the point, puts the ask in the second line, closes "Cheers, Dana", British spelling, no exclamation marks,
+      no emoji, no dashes, apologises at most once, often uses "a bit", "reckon", "sorted" and "shout if", never says "excited", "thrilled",
+      "reach out" or "circle back".
+      The facts to convey: the March workshop moves from the 12th to the 19th because the venue double-booked; ask Priya if
+      the 19th still works.
+      PASS if the email follows that profile and states those facts exactly, without inventing details (times, a new venue,
+      refunds, other attendees, reasons beyond the double booking). Using the profile's own phrases ("a bit", "sorted",
+      "shout if") is following the voice, not inventing; a hyphen inside a word such as "double-booked" is not a dash.
+      Short notes to the user outside the email are fine.
+      FAIL otherwise.
+

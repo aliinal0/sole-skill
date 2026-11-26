@@ -18,7 +18,7 @@ AI answers fan one question into many sub-queries and quote passages that answer
 
 - Accessibility tree is clean: real buttons/links/labels, form fields with labels, no click handlers on `div`s (check with `take_snapshot` in `build/browser-checks.md`).
 - Key actions possible without hover-only menus, infinite scroll traps or CAPTCHA on every step.
-- Machine-readable summaries: `/llms.txt` (site summary + key links), clean Markdown or text versions of docs where useful, structured data (`schema.md`).
+- Machine-readable summaries: `/llms.txt` (site summary + key links), clean Markdown or text versions of docs where useful, structured data (`business/seo/schema.md`).
 - Stable, descriptive URLs and predictable navigation.
 - Lighthouse in recent Chrome includes agent-browsing checks; run `lighthouse_audit` when the browser plugin is available and report what it measured.
 

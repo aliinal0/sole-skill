@@ -7,9 +7,9 @@ AI edits look alike because tools apply the same defaults to every video: every 
 ## 0. Style before cuts
 
 - **The user's style wins.** If they ask for a look this file calls a tell (word-by-word captions, punch-ins, sound effects, a fast cut), do it well and do not argue; one short note on a trade-off at most. The rules below are defaults for when nothing was asked.
-- If `.claude/EDITSTYLE.md` exists, follow it and skip questions it answers.
+- If `.sole/EDITSTYLE.md` exists, follow it and skip questions it answers.
 - Otherwise ask one round (`core/intent.md`, max 4 questions): platform and aspect ratio, target length, who it is for and what they should feel, captions (yes/no, style), music (yes/no, mood), and one video the user likes the look of (theirs or someone else's).
-- "Learn my style": run `scripts/video_check.py` on one or two of the user's finished videos, look at a few frames, and fill `.claude/EDITSTYLE.md` from `templates/EDITSTYLE.md` (ask once before creating it).
+- "Learn my style": run `scripts/video_check.py` on one or two of the user's finished videos, look at a few frames, and fill `.sole/EDITSTYLE.md` from `templates/EDITSTYLE.md` (ask once before creating it).
 
 ## 1. Tools
 
@@ -25,7 +25,7 @@ AI edits look alike because tools apply the same defaults to every video: every 
 3. **Plan in plain words**: structure, what goes and why, captions, B-roll, music, grade, length. **Wait for the user's OK.**
 4. **Cut list** (`edl.json`: source, start, end, reason). Run `scripts/video_check.py --edl edl.json` on it before rendering: it is exact and costs nothing. Then a preview render.
 5. **Self-check before showing it**: frames around every cut, audio at every join, loudness, `scripts/video_check.py` (rhythm, pauses, loudness), the `critic` agent with `build/video/tells.md`. Fix, re-render, max 3 rounds; report what is left.
-6. **Iterate** on feedback. On final, add what was learned to `.claude/EDITSTYLE.md`.
+6. **Iterate** on feedback. On final, add what was learned to `.sole/EDITSTYLE.md`.
 
 ## 3. Cutting like a person
 

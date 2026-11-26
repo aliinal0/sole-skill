@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: cmd-memory
+description: The memory slash command loads its module and does the job (show prints the file).
+tags: [command]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 14
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    /sole:memory show
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'context-memory\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: shows-the-file
+    criteria: |
+      The command is "show", which prints the project memory file. PASS if the answer shows the file's contents, including
+      the goal (a site for Hilltop Roasters), the preferences and the pricing page as the next step, and does not start any
+      work or propose redoing the finished homepage. FAIL otherwise.
+

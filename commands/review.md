@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Senior code review of a diff, branch, PR or the whole repo - bugs, risk, scale, missing tests, speed, and what to delete
 argument-hint: "[nothing for uncommitted changes | branch | PR | path | repo | shortcuts]"
 ---

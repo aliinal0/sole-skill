@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-mkdir -p .claude
-cat > .claude/CONTEXT.md <<'MD'
+mkdir -p .sole
+cat > .sole/CONTEXT.md <<'MD'
 # Project context
 Last updated: 2026-11-10
 

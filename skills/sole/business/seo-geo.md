@@ -7,7 +7,7 @@ Entry point for every SEO request. Read only the reference file the command need
 | Command (or plain-language request) | Read | Output |
 |---|---|---|
 | `audit <url>` - full site audit | all of `business/seo/` as needed, agents in parallel | Health score + prioritised plan |
-| `page <url>` - one page in depth | `technical.md` + `content.md` + `schema.md` | Page report |
+| `page <url>` - one page in depth | `business/seo/technical.md` + `business/seo/content.md` + `business/seo/schema.md` | Page report |
 | `technical <url>` | `business/seo/technical.md` | 9-category technical report |
 | `content <url>` / `content-brief <topic>` | `business/seo/content.md` | E-E-A-T review / writer's brief |
 | `schema <url>` | `business/seo/schema.md` | Found / valid / missing JSON-LD |

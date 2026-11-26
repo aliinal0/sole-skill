@@ -1,0 +1,27 @@
+schema_version: "1.1"
+name: cmd-design
+description: The design slash command loads its module and does the job (reuses the design-critique scenario).
+tags: [command]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 14
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    /sole:design critique index.html
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'commands\.md|craft-floor\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: names-planted-tells
+    criteria: |
+      The page was seeded with these AI-default tells: purple/indigo gradient text in the hero, an ALL-CAPS eyebrow label above
+      every heading, three identical icon+heading+text feature cards, 01/02/03 numbering on non-sequential content, Inter as the only
+      font, and a glassmorphism card. PASS if the critique names at least four of these specifically (with where they are) and gives a
+      concrete fix for each. FAIL otherwise.
+

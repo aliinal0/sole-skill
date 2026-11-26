@@ -1,0 +1,30 @@
+schema_version: "1.1"
+name: cmd-review
+description: The review slash command loads its module and does the job (reuses the code-review scenario).
+tags: [command]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 14
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    /sole:review orders.py (change.diff shows what changed). Don't edit anything.
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'code-review\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: finds-real-problems
+    criteria: |
+      The files (you cannot see them) contain: (a) find_orders builds SQL with an f-string from customer_email, an SQL
+      injection; (b) shipping is free only when the subtotal is strictly over 50, but the README promises free shipping on
+      orders of 50 or more, so an order of exactly 50 is charged; (c) refund subtracts any amount with no check, so a refund
+      larger than the total (or for an unknown order id, which crashes on None) is not handled, and refund has no test;
+      (d) ShippingPolicyFactory and StandardShippingPolicy wrap one if-statement with a factory for a single implementation.
+      PASS if the review finds (a) and (b), each with a concrete case or input, plus at least one of (c) or (d), and ends
+      with a clear verdict on whether to merge. FAIL if it misses (a) or (b), or only lists vague concerns.
+

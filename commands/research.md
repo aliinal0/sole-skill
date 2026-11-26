@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Multi-agent deep research with a saved report
 argument-hint: "<question or topic>"
 ---

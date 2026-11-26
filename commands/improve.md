@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Retrospective after friction - remove stale config first, then propose fixes to CLAUDE.md, memory and setup
 argument-hint: "[what went wrong, optional]"
 ---

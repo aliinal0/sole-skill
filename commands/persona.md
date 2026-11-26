@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Get a specialist's view or deliverable from the Agency Agents persona library (fetched on demand)
 argument-hint: "<role or task> [what to review or produce]"
 ---

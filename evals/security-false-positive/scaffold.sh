@@ -20,12 +20,14 @@ function auth(req, res, next) {
   }
 }
 
-app.get("/orders", auth, async (req, res) => {
+app.get("/orders", auth, async (req, res, next) => {
+  try {
   const { rows } = await pool.query(
     "SELECT id, total, created_at FROM orders WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2",
-    [req.user.id, Math.min(Number(req.query.limit) || 20, 100)]
+    [req.user.id, Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 100)]
   );
   res.json(rows);
+  } catch (err) { next(err); }
 });
 
 app.get("/files/:name", auth, (req, res) => {

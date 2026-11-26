@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Defensive security review - quick scan, focused review, or full audit of this codebase
 argument-hint: "[quick | full | <path or feature>]"
 ---

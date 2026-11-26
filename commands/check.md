@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Check a page in a real browser - render at breakpoints, console errors, accessibility, performance (needs the sole-browser plugin)
 argument-hint: "<url or localhost address> [render | a11y | perf | seo | all]"
 ---

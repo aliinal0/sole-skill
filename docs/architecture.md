@@ -18,7 +18,7 @@ Each skill has its own description (up to 1,024 characters), so each area gets p
 
 ## Three loading levels
 
-1. **Always loaded**: the five descriptions and a one-line hint from the SessionStart hook.
+1. **Always loaded**: the descriptions of the five skills and six agents (commands are user-invoked only, so theirs are not loaded), and a one-line hint from the SessionStart hook.
 2. **On trigger**: the body of one `SKILL.md`: its table and the Shared rules block. A PostToolUse hook then prints the library's absolute path and reminds Claude to read the routed module.
 3. **On demand**: one or two module files from the library (`skills/sole/`: `core/`, `build/`, `business/`, `research/`, `write/`), plus templates and scripts only when a module asks for them.
 
@@ -38,18 +38,20 @@ Every `SKILL.md` carries the same "Shared rules" block: library location, memory
 ```
 
 - **Modules are independent**: each can be read alone. They reference each other by library path when combined (e.g. `business/ads.md` -> `write/humanize-text.md`), whichever skill loaded them.
-- **Agents are shared**: no module defines its own subagent. This keeps behaviour consistent and lets modules run work in parallel.
+- **Agents are shared**: no module defines its own subagent; a few use Claude Code's built-in Explore or general-purpose agents. This keeps behaviour consistent and lets modules run work in parallel.
 
 ## Persistence
 
+Notes live in `.sole/` rather than `.claude/`, because Claude Code asks before every write under `.claude/`.
+
 | File | Owner | Purpose |
 |---|---|---|
-| `.claude/CONTEXT.md` | `core/context-memory.md`, `memory-keeper` | Goal, preferences, decisions, progress, next steps, reminders |
-| `.claude/CODEMAP.md` | `build/code-map.md` | Lightweight map of the codebase |
-| `.claude/VOICE.md` | `write/humanize-text.md` | The user's writing voice profile |
-| `.claude/EDITSTYLE.md` | `build/video/edit.md` | The user's editing style |
-| `.claude/sole/` | research and competitor modules | Caches: source lists, raw competitor notes |
+| `.sole/CONTEXT.md` | `core/context-memory.md`, `memory-keeper` | Goal, preferences, decisions, progress, next steps, reminders |
+| `.sole/CODEMAP.md` | `build/code-map.md` | Lightweight map of the codebase |
+| `.sole/VOICE.md` | `write/humanize-text.md` | The user's writing voice profile |
+| `.sole/EDITSTYLE.md` | `build/video/edit.md` | The user's editing style |
+| `.sole/research/`, `.sole/competitors/`, `.sole/seo-baseline/` | research, competitor and SEO modules | Caches: source lists, raw competitor notes |
 | `DESIGN.md`, `PRODUCT.md` | `build/deslop-ui.md`, `build/design/commands.md` | Design system and product context (shared with other design tools) |
 | `docs/sole/<type>/*.md` | research, competitor, security modules | Reports for people (asked once before the first write) |
 
-The SessionStart hook (`hooks/load-context.sh`) prints the one-line hint and `.claude/CONTEXT.md` (first 200 lines) at startup, resume, clear and after compaction. The file is framed as notes, not commands, so a CONTEXT.md planted in a cloned repo cannot order Claude around.
+The SessionStart hook (`hooks/load-context.sh`) prints the one-line hint and `.sole/CONTEXT.md` (first 200 lines; it falls back to `.claude/CONTEXT.md`, where versions before 1.2.0 kept it) at startup, resume, clear and after compaction. The file is framed as notes, not commands, so a CONTEXT.md planted in a cloned repo cannot order Claude around.

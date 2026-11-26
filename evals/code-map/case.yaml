@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: code-map
-description: '"Map this codebase" writes a short .claude/CODEMAP.md with the real entry points, modules and data flow, linking files instead of pasting code.'
+description: '"Map this codebase" writes a short .sole/CODEMAP.md with the real entry points, modules and data flow, linking files instead of pasting code.'
 tags: [routing, build, code-map]
 runs: 1
 context:
@@ -22,8 +22,8 @@ graders:
     focus: trace
     arm: with-only
     criteria: |
-      This is the agent's trace. The test sandbox denies writes inside .claude/, so judge the code map the agent TRIED to
-      write to .claude/CODEMAP.md in its Write tool call (a denied write is fine; no attempt to write a map file is FAIL).
+      This is the agent's trace. Judge the code map the agent wrote (or tried to write)
+      write to .sole/CODEMAP.md in its Write tool call (a denied write is fine; no attempt to write a map file is FAIL).
       The repo (you cannot see it) is parcelpost-api: Express API started by src/server.js, and a BullMQ queue worker
       started by src/jobs/worker.js (two entry points). POST /shipments (src/routes/shipments.js) prices the parcel with
       src/services/pricing.js quote(weightKg, zone), inserts it with src/db/index.js (Postgres via pg) and queues a "label"

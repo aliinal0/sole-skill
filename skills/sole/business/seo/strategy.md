@@ -30,6 +30,6 @@ Free signals: Common Crawl domain data, Bing Webmaster Tools, Moz free metrics, 
 
 ## `drift` - catch SEO regressions
 
-Before a release or redesign, save a baseline to `.claude/sole/seo-baseline/<host>.json` for the key URLs: status, title, meta description, canonical, robots, H1, JSON-LD types, internal link count, word count. After the release, compare and report changes by severity (lost canonical/noindex/404 = critical; title or schema change = high; copy length = low).
+Before a release or redesign, save a baseline to `.sole/seo-baseline/<host>.json` for the key URLs: status, title, meta description, canonical, robots, H1, JSON-LD types, internal link count, word count. After the release, compare and report changes by severity (lost canonical/noindex/404 = critical; title or schema change = high; copy length = low).
 
 Credit: condensed from `claude-seo` (seo-plan, seo-cluster, seo-programmatic, seo-competitor-pages, seo-sxo, seo-backlinks, seo-drift) by AgriciDaniel (MIT). Modified.

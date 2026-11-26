@@ -36,6 +36,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import textwrap
 import threading
 import time
 
@@ -45,8 +46,10 @@ SKILL = os.path.join(ROOT, "skills", "sole")
 RESULTS = os.path.join(EVALS, "results")
 CACHE = os.path.join(RESULTS, "cache")
 CORE = ["skills/*/SKILL.md", ".claude-plugin/plugin.json", "hooks/*", "commands/*.md", "agents/*.md"]
-LIMIT_RE = re.compile(r"hit your [^\n]*?limit[^\n]*?resets\s+([0-9]{1,2}(?::[0-9]{2})?\s*[ap]m|[0-9]{1,2}:[0-9]{2})", re.I)
+LIMIT_RE = re.compile(r"hit your [^\n]*?limit[^\n]*?resets?\s+(?:at\s+)?(?:[a-z]{3,9}\.?\s+[0-9]{1,2},?\s+(?:at\s+)?)?([0-9]{1,2}(?::[0-9]{2})?\s*[ap]m|[0-9]{1,2}:[0-9]{2})", re.I)
+PY_ONLY_RE = re.compile(r"\(\?(?:[aiLmsux]+\)|P[<=>])")
 REF_RE = re.compile(r"`((?:core|build|business|research|write|templates|scripts)/[A-Za-z0-9/._-]+\.(?:md|py))`")
+SHARED_RE = re.compile(r"^## Shared rules\n.*?(?=^## |\Z)", re.S | re.M)
 STOP = threading.Event()
 
 
@@ -91,11 +94,15 @@ def grader_blocks(case):
     body = case_text(case).split("\ngraders:", 1)[-1]
     out = []
     for b in re.split(r"\n  - type:", body)[1:]:
-        name = re.search(r"^\s*name:\s*(\S+)", b, re.M)
-        out.append({"type": b.split("\n", 1)[0].strip(), "name": name.group(1) if name else "",
-                    "with_only": bool(re.search(r"^\s*arm:\s*with-only", b, re.M)),
+        name = re.search(r"^\s*name:\s*[\"']?([^\s\"']+)", b, re.M)
+        crit = re.search(r"^( *)criteria:\s*[|>][-+]?\n((?:\1 +.*\n|\s*\n)+)", b + "\n", re.M)
+        out.append({"type": b.split("\n", 1)[0].strip(), "name": name.group(1) if name else "", "body": b,
+                    "with_only": bool(re.search(r"^\s*arm:\s*[\"']?with-only", b, re.M)),
+                    "tool": (re.search(r"^\s*tool:\s*(\w+)", b, re.M) or [None, ""])[1],
+                    "max": (re.search(r"^\s*max:\s*(\d+)", b, re.M) or [None, None])[1],
                     "input_match": (re.search(r"^\s*input_match:\s*'(.*)'\s*$", b, re.M) or [None, None])[1],
-                    "pattern": pattern_of(b)})
+                    "pattern": pattern_of(b),
+                    "criteria": textwrap.dedent(crit.group(2)).strip() if crit else None})
     return out
 
 
@@ -121,7 +128,7 @@ def module_files(case):
     hits = set()
     for g in grader_blocks(case):
         pat = g["input_match"]
-        if g["type"] != "tool_used" or not pat:
+        if g["type"] != "tool_used" or g["tool"] != "Read" or g["max"] == "0" or not pat:
             continue
         try:
             rx = re.compile(pat)
@@ -131,12 +138,17 @@ def module_files(case):
             r = rel(p)
             if rx.search(r) or rx.search(r.replace("/", "\\")):
                 hits.add(p)
-    for p in list(hits):
-        if p.endswith(".md"):
-            for ref in REF_RE.findall(open(p, encoding="utf-8").read()):
-                q = os.path.join(SKILL, ref)
-                if os.path.isfile(q):
-                    hits.add(q)
+    shared = SHARED_RE.search(open(os.path.join(SKILL, "SKILL.md"), encoding="utf-8").read())
+    hits |= {os.path.join(SKILL, r) for r in REF_RE.findall(shared.group(0) if shared else "")}
+    todo = [p for p in hits if p.endswith(".md")]
+    while todo:
+        text = open(todo.pop(), encoding="utf-8").read()
+        for ref in REF_RE.findall(text) + [f"scripts/{s}" for s in re.findall(r"scripts/([\w-]+\.py)", text)]:
+            q = os.path.join(SKILL, ref)
+            if os.path.isfile(q) and os.path.normpath(q) not in {os.path.normpath(h) for h in hits}:
+                hits.add(q)
+                if q.endswith(".md"):
+                    todo.append(q)
     return {os.path.normpath(p) for p in hits}
 
 
@@ -178,9 +190,6 @@ def cache_put(case, arm, key, runs, meta):
 
 # ---------------------------------------------------------------- free checks
 
-SHARED_RE = re.compile(r"^## Shared rules\n.*?(?=^## |\Z)", re.S | re.M)
-
-
 def skill_checks():
     """Every Sole skill: a description of at most 1024 characters, a name that matches its folder, and the
     same Shared rules block as the general skill (so limits and economy rules cannot drift apart)."""
@@ -210,6 +219,8 @@ def static_checks(claude):
                           capture_output=True, text=True, encoding="utf-8", errors="replace")
     if proc.returncode:
         problems.append("unit tests failed:\n" + (proc.stderr or proc.stdout)[-2000:])
+    if not claude:
+        log("note: claude CLI not found, so `plugin validate` was skipped")
     for target in (".", "plugins/browser"):
         if claude and os.path.isdir(os.path.join(ROOT, target)):
             v = subprocess.run([claude, "plugin", "validate", target], cwd=ROOT, capture_output=True, text=True,
@@ -226,7 +237,11 @@ def static_checks(claude):
                 problems.append(f"{rel(path)} points to missing {ref}")
     for case in list_cases(None, None):
         for g in grader_blocks(case):
+            if not g["name"] or ("input_match:" in g["body"] and not g["input_match"]):
+                problems.append(f"{case}/{g['name'] or '?'}: grader needs a name, and input_match in single quotes")
             for field in ("input_match", "pattern"):
+                if g[field] and PY_ONLY_RE.search(g[field]):
+                    problems.append(f"{case}/{g['name']}: {field} uses Python-only syntax; the CLI runs JavaScript (use flags: i)")
                 if g[field]:
                     try:
                         re.compile(g[field])
@@ -243,7 +258,9 @@ def find_claude(explicit):
     for cand in (explicit, os.environ.get("CLAUDE_BIN"), shutil.which("claude")):
         if cand and (os.path.isfile(cand) or shutil.which(cand)):
             return cand
-    return None
+    # The Claude desktop app on Windows keeps its own CLI, newest version last, outside PATH.
+    found = glob.glob(os.path.join(os.environ.get("LOCALAPPDATA", ""), "Claude-Data", "*", "claude-code", "*", "*", "claude.exe"))
+    return max(found, key=os.path.getmtime) if found else None
 
 
 def limit_reset(text):
@@ -283,7 +300,9 @@ def run_case(claude, case, need, k, args, settings_meta):
         log(f"run  {case} ({'with Sole only' if need == 'with' else 'with and without'})")
         proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT, env=env)
         text = open(out, encoding="utf-8").read() if os.path.isfile(out) else ""
-    reset = limit_reset(proc.stdout + proc.stderr + text)
+    cases_out = (json.loads(text).get("cases") or [{}]) if text else [{}]
+    all_runs = [r for a in cases_out[0].get("arms", {}).values() for r in a or []]
+    reset = limit_reset(proc.stdout + proc.stderr + " ".join(str(r.get("error") or "") for r in all_runs))
     if reset:
         STOP.set()
         log(f"limit {case}: usage limit hit, resets {reset}")
@@ -291,11 +310,14 @@ def run_case(claude, case, need, k, args, settings_meta):
     if not text:
         log(f"FAIL {case}: no result ({(proc.stdout + proc.stderr).strip()[-300:]})")
         return case, "error"
-    data = json.loads(text)["cases"][0]
+    failed = [r["error"] for r in all_runs if r.get("error")]
     for arm in ("with", "without"):
-        runs = data.get("arms", {}).get(arm)
-        if runs:
+        runs = cases_out[0].get("arms", {}).get(arm)
+        if runs and not any(r.get("error") for r in runs):
             cache_put(case, arm, k[arm], runs, settings_meta)
+    if failed:
+        log(f"FAIL {case}: {short(failed[0], 300)}")
+        return case, "error"
     log(f"done {case}")
     return case, "ok"
 
@@ -304,10 +326,7 @@ def run_case(claude, case, need, k, args, settings_meta):
 
 def explain(claude, case, runs, args):
     """Ask the judge, once, why each failed llm grader failed; stored inside the cached runs."""
-    crit = {}
-    text = case_text(case)
-    for m in re.finditer(r"name:\s*(\S+)\n(?:.*\n)*?\s*criteria: \|\n((?:      .*\n|\s*\n)+)", text):
-        crit[m.group(1)] = "\n".join(l[6:] for l in m.group(2).splitlines())
+    crit = {g["name"]: g["criteria"] for g in grader_blocks(case) if g["criteria"]}
     changed = False
     for r in runs:
         for g in r.get("graders", []):
@@ -316,14 +335,26 @@ def explain(claude, case, runs, args):
             q = (f"You are grading the output of a coding agent against a criterion.\n\nCriterion:\n{crit[g['name']]}\n\n"
                  f"Agent output:\n{g['evidence']}\n\nIn at most 3 short lines, name only the parts of the criterion that "
                  "are not met and why. Then end with PASS or FAIL.")
-            p = subprocess.run([claude, "-p", q, "--model", args.judge_model, "--max-turns", "1", "--output-format", "json"],
-                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+            p = subprocess.run([claude, "-p", "--model", args.judge_model, "--max-turns", "1", "--output-format", "json"],
+                               input=q, capture_output=True, text=True, encoding="utf-8", errors="replace")
             try:
-                g["why"] = json.loads(p.stdout).get("result", "").strip()
-                changed = True
+                out = json.loads(p.stdout)
             except ValueError:
-                pass
+                continue
+            why = (out.get("result") or "").strip()
+            if p.returncode or out.get("is_error") or not why or LIMIT_RE.search(why):
+                continue   # a refused or limited judge call is not an explanation; try again next time
+            g["why"] = why
+            changed = True
     return changed
+
+
+def explain_all(claude, cases, settings, args):
+    for case in cases:
+        key = keys(case, settings)["with"]
+        entry = cache_get(case, "with", key)
+        if entry and explain(claude, case, entry["runs"], args):
+            cache_put(case, "with", key, entry["runs"], entry.get("meta", {}))
 
 
 # ---------------------------------------------------------------- report
@@ -344,11 +375,11 @@ def report(cases, settings, settings_label, static_problems):
     tot = {"with": [0, 0], "without": [0, 0]}
     cost = {"with": 0.0, "without": 0.0}
     turns = {"with": 0, "without": 0}
-    missing = []
+    missing, both = [], {"with": [0, 0], "without": [0, 0]}
     for case in cases:
         k = keys(case, settings)
         skip = with_only_graders(case)
-        cells = []
+        cells, seen = [], {}
         for arm in ("with", "without"):
             entry = cache_get(case, arm, k[arm])
             if not entry:
@@ -360,6 +391,7 @@ def report(cases, settings, settings_label, static_problems):
             ok = sum(1 for r in runs if run_passed(r, skip))
             tot[arm][0] += ok
             tot[arm][1] += len(runs)
+            seen[arm] = (ok, len(runs))
             cost[arm] += sum((r.get("costUsd") or 0) + (r.get("judgeCostUsd") or 0) for r in runs)
             turns[arm] += sum(r.get("turns") or 0 for r in runs)
             fails = sorted({g["name"] for r in runs for g in r.get("graders", []) if not g.get("passed")})
@@ -368,16 +400,26 @@ def report(cases, settings, settings_label, static_problems):
                 for g in r.get("graders", []):
                     if not g.get("passed"):
                         details.append((case, arm, g))
+        if len(seen) == 2:
+            for arm, (ok, n) in seen.items():
+                both[arm][0] += ok
+                both[arm][1] += n
         rows.append(f"| {case} | {cells[0][0]} | {short(cells[0][1], 60)} | {cells[1][0]} | {short(cells[1][1], 60)} |")
 
     def per_pass(arm):
         return f"${cost[arm] / tot[arm][0]:.3f}" if tot[arm][0] else "-"
 
     lines = [f"# Sole test report - {dt.datetime.now():%Y-%m-%d %H:%M}", "", f"Settings: {settings_label}", ""]
-    lines += ["Free checks: " + ("pass" if not static_problems else "FAIL"), ""]
+    lines += ["Free checks: " + ("not run" if static_problems is None else "FAIL" if static_problems else "pass"), ""]
     lines += [f"Eval runs passed: with Sole {tot['with'][0]}/{tot['with'][1]}, without {tot['without'][0]}/{tot['without'][1]}.",
               f"Cost (agent + judge): with ${cost['with']:.2f}, without ${cost['without']:.2f}; per passing answer "
               f"{per_pass('with')} vs {per_pass('without')}. Turns: {turns['with']} vs {turns['without']}.", ""]
+    if both["with"][1] and both["with"][1] != tot["with"][1]:
+        lines += [f"Over the cases that have both arms: with Sole {both['with'][0]}/{both['with'][1]}, "
+                  f"without {both['without'][0]}/{both['without'][1]}.", ""]
+    commands = [c for c in cases if re.search(r"prompt: \|\n\s+/sole:", case_text(c))]
+    if commands:
+        lines += [f"Slash-command cases (plain Claude cannot pass these by construction): {', '.join(commands)}", ""]
     if missing:
         lines += [f"No with-Sole result yet for: {', '.join(missing)}", ""]
     lines += ["Graders marked with-only (did the plugin load, was the module read) are listed when they fail but only "
@@ -400,7 +442,7 @@ def report(cases, settings, settings_label, static_problems):
     for p in (path, os.path.join(RESULTS, f"report-{dt.datetime.now():%Y%m%d-%H%M}.md")):
         with open(p, "w", encoding="utf-8") as f:
             f.write(text)
-    return path, tot
+    return path, tot, missing
 
 
 # ---------------------------------------------------------------- main
@@ -424,13 +466,15 @@ def main():
     ap.add_argument("--report-only", action="store_true", help="only rebuild the report from the cache")
     ap.add_argument("--claude", help="path to the claude CLI")
     args = ap.parse_args()
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(errors="replace")
 
     claude = find_claude(args.claude)
     cases = list_cases(args.case, args.tag)
     version = ""
     if claude:
         version = subprocess.run([claude, "--version"], capture_output=True, text=True).stdout.strip()
-    settings = f"model={args.model or 'default'}|effort={args.effort or 'default'}|judge={args.judge_model}|runs={args.runs}|cli={version}"
+    settings = f"model={args.model or 'default'}|effort={args.effort or os.environ.get('CLAUDE_CODE_EFFORT_LEVEL') or 'default'}|judge={args.judge_model}|runs={args.runs}|cli={version}"
     label = settings.replace("|", ", ")
 
     problems = [] if args.no_static or args.report_only else static_checks(claude)
@@ -441,8 +485,10 @@ def main():
     else:
         log("free checks: ok" if not (args.no_static or args.report_only) else "free checks: skipped")
     if args.static_only or args.report_only or problems:
-        path, _ = report(cases, settings, label, problems)
-        log(f"report: {path}")
+        if args.report_only:
+            if args.explain and claude:
+                explain_all(claude, cases, settings, args)
+            log(f"report: {report(cases, settings, label, None)[0]}")
         sys.exit(1 if problems else 0)
     if not claude:
         sys.exit("error: claude CLI not found. Pass --claude PATH or set CLAUDE_BIN.")
@@ -477,17 +523,12 @@ def main():
         time.sleep(wait)
 
     if args.explain:
-        for case in cases:
-            k = keys(case, settings)
-            for arm in ("with",):
-                entry = cache_get(case, arm, k[arm])
-                if entry and explain(claude, case, entry["runs"], args):
-                    cache_put(case, arm, k[arm], entry["runs"], entry.get("meta", {}))
+        explain_all(claude, cases, settings, args)
 
-    path, tot = report(cases, settings, label, [])
+    path, tot, missing = report(cases, settings, label, None if args.no_static else [])
     log(f"report: {path}")
     log(f"with Sole {tot['with'][0]}/{tot['with'][1]}, without {tot['without'][0]}/{tot['without'][1]}")
-    sys.exit(0 if tot["with"][1] and tot["with"][0] == tot["with"][1] else 1)
+    sys.exit(0 if tot["with"][1] and not missing and tot["with"][0] == tot["with"][1] else 1)
 
 
 if __name__ == "__main__":

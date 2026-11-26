@@ -5,7 +5,7 @@ The tell lists below are for English text.
 ## Method
 
 1. **Mark the tells**: read the whole text once, mark every pattern below, strongest first. Look at paragraph shape too, not only sentences.
-2. **Rewrite**: keep every fact, name, number, date, quote and claim. You may shorten, merge, reorder. Where the text is generic, make it specific using only facts already in the text or given by the user; otherwise write a simpler sentence. Never invent facts, numbers, limits or examples. A sentence that only praises ("an indispensable address", "loved by many") either goes or keeps its claim as it is; never swap it for a new claim about customers, popularity or results ("many regulars now..."). Do not explain what a feature does beyond the source either: "integrates with Slack" may become "works with Slack", never "log hours from Slack".
+2. **Rewrite**: keep every fact, name, number, date, quote and claim. You may shorten, merge, reorder. Where the text is generic, make it specific using only facts already in the text or given by the user; otherwise write a simpler sentence. Never invent facts, numbers, limits or examples. A sentence that only praises ("an indispensable address", "loved by many") either goes or keeps its claim as it is; never swap it for a new claim about customers, popularity or results ("many regulars now..."). Praise adjectives work the same way: drop "seamless booking and state-of-the-art kilns" rather than restating it as "booking is easy, the kilns are modern", and do not put a new audience line ("for anyone who wants to...") in its place. Do not explain what a feature does beyond the source either: "integrates with Slack" may become "works with Slack", never "log hours from Slack".
 3. **Check**: did any fact change or vanish? Then read it as a stranger: what still sounds generated? Re-check the survivors: contrasts, closers, triads, dashes, bold labels.
 4. **Final**: state each point plainly. Vary sentence length. If a sentence stays awkward, rewrite the paragraph around its main point.
 
@@ -18,10 +18,10 @@ The tell lists below are for English text.
 | "humanize / rewrite this" (default) | **rewrite** | The clean text only |
 | "suggest edits I can accept" | **cleanup** | Numbered edits: original span -> replacement -> pattern # |
 | "audit / check before publishing / flag only" | **report** | Issues found (span, pattern #, severity, why) + a short assessment; original untouched |
-| "learn my voice" | **teach** | Build `.claude/VOICE.md` from `templates/VOICE.md` using 3+ samples the user wrote (ask for them, or read files they point to) |
-| "write this in my voice" | **mimic** | Draft using `VOICE.md`; then run the patterns below on the draft |
+| "learn my voice" | **teach** | Build `.sole/VOICE.md` from `templates/VOICE.md` using 3+ samples the user wrote (ask for them, or read files they point to) |
+| "write this in my voice" | **mimic** | Draft using `VOICE.md`, with only the facts given: no added feeling, offer or outcome ("it's sorted now", "we'll work something out"); then run the patterns below on the draft |
 
-If `.claude/VOICE.md` exists, every rewrite also matches it (sentence length, openings, formality, words they use and never use).
+If `.sole/VOICE.md` exists, every rewrite also matches it (sentence length, openings, formality, words they use and never use).
 
 Strict check (on request): give before/after pattern counts and the share of text changed. More than ~40% changed on a "light edit" request means you over-edited.
 

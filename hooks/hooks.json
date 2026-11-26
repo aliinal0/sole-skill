@@ -1,5 +1,5 @@
 {
-  "description": "Sole: routing hint plus the project memory file (.claude/CONTEXT.md) at session start and after compaction; the module library path and a read-the-module reminder right after a Sole skill loads",
+  "description": "Sole: routing hint plus the project memory file (.sole/CONTEXT.md) at session start and after compaction; the module library path and a read-the-module reminder right after a Sole skill loads",
   "hooks": {
     "SessionStart": [
       {

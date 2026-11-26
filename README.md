@@ -89,11 +89,12 @@ You do not have to use commands. Ask for what you want in plain words and Sole p
 Yes, for the ones Sole replaces. If they stay, two skills react to the same request with different rules. Remove `ponytail`, `frontend-design`, `impeccable`, `design-taste-frontend`, `frontend-design-deslop`, `humanizer`, `unslop`, `caveman`, `grill-me`, `grilling`, `handoff`, `deep-research`, `deep-dive`, `fetching-blocked-urls`, `security-audit`, `improve`, Corey Haines' marketing skills, Agency Agents copied into `~/.claude/agents`, and Google's own `chrome-devtools-mcp` plugin if you use `sole-browser`. Two can stay: **graphify**, whose code map Sole uses, and **claude-seo**, if you need its Google API connections and PDF reports. Run `/plugin` to see what you have installed.
 
 **Does it cost more?**
-Each answer costs a little more, because Sole reads a short skill file and often one chapter before answering. In our tests (41 cases at API list prices) a run with Sole cost about 1.4 times as much as one without. But Sole gave many more right answers (38 of 41 against 18 of 41), so the cost per correct answer was about 30% lower: $0.19 against $0.28. You also save elsewhere: Claude does not reread a whole conversation or codebase after a reset, does not redo work, writes less code you have to review, and you are not running several overlapping skills at once. For simple questions Sole is not loaded at all. Its fixed cost is the five skills' short descriptions and a one-line hint at the start of each session.
+Each answer costs more, because Sole reads a short skill file and often one chapter before answering. In our last full run (62 cases, one run each, Claude Code 2.1.330, API list prices) Sole passed 57 cases and plain Claude 32. Sixteen of those cases start with a Sole slash command, which plain Claude cannot really pass; without them the score is 42 of 46 against 25 of 46. A run with Sole cost about 1.5 times as much ($10.50 against $6.99), so the cost per passing answer was about 16% lower: $0.18 against $0.22. Results vary from run to run; `evals/run.py --runs 3` shows how much. You also save elsewhere: Claude does not reread a whole conversation or codebase after a reset, does not redo work, and you are not running several overlapping skills at once. For simple questions Sole is not loaded at all. Its fixed cost is the five skills' short descriptions and a one-line hint at the start of each session and one line each for the six agents. The slash commands load only when you type them.
 
 ## Limits
 
 - Web pages: Sole reads public pages only. It does not solve CAPTCHAs, log in to sites or get around paywalls.
+- At low effort Claude skips the skill more often (9 of 12 test cases passed at low effort, 12 of 12 with Sonnet, 11 of 12 with Haiku).
 - Tested on Claude Code 2.1 on Windows. macOS and Linux should work (they need `bash` and Python 3) but have not been tested yet.
 - SEO rules and search-engine features change often. Sole's SEO chapters date their facts and tell Claude to check them before quoting.
 
@@ -106,13 +107,13 @@ flowchart LR
     R["Your request"] --> S["One of five skills<br/>code · visual · write · business · sole"]
     S -->|"opens 1-2"| M["Shared library skills/sole/<br/>core · build · business · research · write"]
     M --> A["Shared agents<br/>researcher · web-fetcher · critic<br/>strategist · memory-keeper · security-auditor"]
-    H["SessionStart hook"] -.->|"loads .claude/CONTEXT.md"| S
+    H["SessionStart hook"] -.->|"loads .sole/CONTEXT.md"| S
     M -.->|"optional"| B["sole-browser<br/>Chrome DevTools MCP"]
 ```
 
 Sole loads in three levels, so most of it costs nothing until it is needed:
 
-1. **Always loaded:** the five skills' descriptions and a one-line hint printed by the SessionStart hook.
+1. **Always loaded:** the descriptions of the five skills and six agents, and a one-line hint printed by the SessionStart hook.
 2. **When a request matches:** one skill file: [`code`](skills/code/SKILL.md), [`visual`](skills/visual/SKILL.md), [`write`](skills/write/SKILL.md), [`business`](skills/business/SKILL.md) or the general [`sole`](skills/sole/SKILL.md). Each holds a table for its own area and the same short block of shared rules. The code skill also holds the coding rules themselves, so most coding needs nothing else.
 3. **On demand:** one or two module files, each under 100 lines.
 
@@ -130,7 +131,7 @@ The modules are grouped in five folders under `skills/sole/`, the shared library
 
 Modules never define their own helpers. They call six shared agents, so the same researcher or reviewer behaves the same way in every task, and independent agents run in parallel.
 
-The **SessionStart hook** ([`hooks/load-context.sh`](hooks/load-context.sh)) runs when a session starts, resumes or is compacted. It prints the one-line routing hint and, if the project has a `.claude/CONTEXT.md`, its first 200 lines. Claude continues from that file's "Next" section instead of rereading the chat. The file is treated as notes, not commands, so a `CONTEXT.md` that arrives with someone else's repository cannot tell Claude what to do. A second hook ([`hooks/after-skill.sh`](hooks/after-skill.sh)) runs right after a Sole skill loads, prints where the library is, and reminds Claude to open the chapter before answering.
+The **SessionStart hook** ([`hooks/load-context.sh`](hooks/load-context.sh)) runs when a session starts, resumes or is compacted. It prints the one-line routing hint and, if the project has a `.sole/CONTEXT.md`, its first 200 lines. Claude continues from that file's "Next" section instead of rereading the chat. The file is treated as notes, not commands, so a `CONTEXT.md` that arrives with someone else's repository cannot tell Claude what to do. A second hook ([`hooks/after-skill.sh`](hooks/after-skill.sh)) runs right after a Sole skill loads, prints where the library is, and reminds Claude to open the chapter before answering.
 
 The **`sole-browser` plugin** ([`plugins/browser/`](plugins/browser)) starts Google's [Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp) server, pinned to version 1.13.0. It runs Chrome headless in a temporary profile that cannot see your logins, with Google's usage statistics and CrUX lookups turned off.
 
@@ -140,7 +141,7 @@ The **specialist personas** are not installed. [`personas.md`](skills/sole/perso
 
 What Sole writes to your project, after asking once:
 
-- Claude's own notes: `.claude/CONTEXT.md`, `.claude/CODEMAP.md`, `.claude/VOICE.md`, and caches in `.claude/sole/`
+- Claude's own notes: `.sole/CONTEXT.md`, `.sole/CODEMAP.md`, `.sole/VOICE.md`, `.sole/EDITSTYLE.md`, `~/.sole/improve-learnings.md`, and caches in `.sole/` (before 1.2.0 these lived in `.claude/`; Sole still reads them there and moves them on the next save)
 - Design files your team can edit: `DESIGN.md`, `PRODUCT.md`
 - Reports for people: `docs/sole/<type>/`
 
@@ -148,7 +149,7 @@ Secrets, API keys and personal data are never written to these files.
 
 What leaves your machine, and only when a task needs it:
 
-- The pages you ask Claude to read. If a page fails to load directly, its address is sent to Jina Reader (`r.jina.ai`), or to Firecrawl if you set a `FIRECRAWL_API_KEY`. A page that shows a CAPTCHA or a "verify you are human" check is never sent on; Sole asks you instead.
+- The pages you ask Claude to read. If a page fails to load directly, its address is sent to Jina Reader (`r.jina.ai`), or to Firecrawl if you set a `FIRECRAWL_API_KEY`. A page that shows a CAPTCHA or a "verify you are human" check, or refuses access, is never sent on; Sole asks you instead. Local and private addresses are never sent on.
 - Requests to GitHub for a persona file or a public design reference.
 - Pages opened by `sole-browser`.
 

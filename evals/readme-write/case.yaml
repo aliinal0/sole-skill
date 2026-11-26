@@ -38,6 +38,9 @@ graders:
       exactly one input file path (stdin is NOT supported) and has only these options: --trim (trim whitespace in cells),
       --dedupe (drop duplicate rows), --delimiter <char> (default ","), --out <file> (write to a file instead of stdout),
       --help / -h. It skips blank lines, and exits with status 2 unless exactly one input file is given. Licence: MIT.
+      Also true of the code, so stating them is accurate: quoted fields are not parsed; the header row is treated like any
+      other row; output uses LF line endings; trimming runs before deduplicating; an unreadable input file makes Node exit
+      with code 1; `node bin/csvtidy.js` runs it without installing.
       PASS if the README opens with one line saying what it is and who it is for, has a quick start that would work, shows
       usage examples using only the real options, does not invent options or features (no stdin/pipe support, no --json,
       --sort, --columns, config files, GUI or Windows installer), has no marketing adjectives or emoji headings, and names

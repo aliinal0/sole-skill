@@ -10,7 +10,7 @@ Never ask about facts you can find yourself (files, code, docs, the web). Look t
 
 ## 2. Read the stored preferences first
 
-Check `.claude/CONTEXT.md` -> `## Preferences`. Do not ask again about anything recorded there.
+Check `.sole/CONTEXT.md` -> `## Preferences`. Do not ask again about anything recorded there.
 
 ## 3. Ask in rounds (decision tree)
 
@@ -39,7 +39,7 @@ Pick only the ones that change the result:
 
 ## 5. Confirm, then record
 
-Restate the brief in 2-4 lines before large work. When the user states a lasting preference ("always keep it short", "no emojis", "I prefer Vue"), save it to `.claude/CONTEXT.md` -> `## Preferences` (ask once before creating the file).
+Restate the brief in 2-4 lines before large work. When the user states a lasting preference ("always keep it short", "no emojis", "I prefer Vue"), save it to `.sole/CONTEXT.md` -> `## Preferences` (ask once before creating the file).
 
 ## 6. Deliver to the brief
 

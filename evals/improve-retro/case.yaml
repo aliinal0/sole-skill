@@ -21,7 +21,6 @@ graders:
     name: nothing-changed-before-picking
     target: { source: file, path: CLAUDE.md }
     pattern: "Install: `yarn install`"
-    arm: with-only
   - type: llm
     name: finds-the-cause
     criteria: |
@@ -30,5 +29,5 @@ graders:
       folder); it repeats the 2-space indentation rule twice; and it has an old History section. The repo uses npm
       (package-lock.json).
       PASS if the reply identifies that CLAUDE.md itself causes both problems (the yarn commands contradict the npm rule;
-      /spec is wrong, tests are in tests/), fixes them by removing or correcting the wrong lines rather than only adding
-      another rule on top, and notices the duplicated indentation rule. FAIL otherwise.
+      /spec is wrong, tests are in tests/), proposes removing or correcting the wrong lines rather than only adding another
+      rule on top, notices the duplicated indentation rule, and asks which changes to apply. FAIL otherwise.

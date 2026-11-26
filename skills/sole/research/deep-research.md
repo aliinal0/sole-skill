@@ -4,7 +4,7 @@ Use when a question needs many sources, a comparison or a report. For a single f
 
 ## 1. Plan as a dependency graph
 
-Break the question into 4-8 sub-questions (max 12). Each must be answerable by someone with no other context in 1-3 searches.
+Break the question into 4-8 sub-questions (max 12). Each must be answerable by someone with no other context in 1-3 searches. Word them as questions, not as things you already know. For rules, prices or anything that changes, one step checks the current status and date in a primary source.
 
 ```
 | ID | Sub-question | Depends on |
@@ -21,7 +21,7 @@ Show the table, then start. Do not wait for approval unless the scope is unclear
 - **Wave 1**: every node with no dependencies -> one `researcher` agent each, **all launched in the same message** (parallel).
 - **Wave 2+**: nodes whose dependencies are done; paste the dependency findings into their brief.
 - Each agent returns only: Findings (with inline sources), Gaps, Sources. This keeps the main context small.
-- After each wave, append sources to `.claude/sole/research/<topic-slug>-sources.json` so they survive a context reset.
+- After each wave, append sources to `.sole/research/<topic-slug>-sources.json` so they survive a context reset.
 
 ## 3. One gap round, max
 

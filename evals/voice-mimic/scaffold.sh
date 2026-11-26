@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-mkdir -p .claude
-cat > .claude/VOICE.md <<'MD'
+mkdir -p .sole
+cat > .sole/VOICE.md <<'MD'
 # Voice profile
 Samples used: 5 (emails) | Updated: 2026-11-02
 Language(s): English (British)

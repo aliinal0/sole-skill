@@ -5,7 +5,7 @@ Run on deliverables only (a UI, a document, a campaign, a feature). Skip for qui
 ## 1. Brief check
 
 - Does it do what the user asked, and nothing big they did not ask for?
-- Does it respect `.claude/CONTEXT.md` preferences and `DESIGN.md`?
+- Does it respect `.sole/CONTEXT.md` preferences and `DESIGN.md`?
 
 ## 2. Correctness
 

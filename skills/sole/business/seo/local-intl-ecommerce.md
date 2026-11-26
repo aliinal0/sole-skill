@@ -13,7 +13,7 @@ Type: brick-and-mortar (customers visit), service-area business (you visit them;
 | Local schema (10%) | LocalBusiness subtype, address, geo, openingHours, `sameAs` to profiles; one entity per location |
 | Local links (10%) | Local press, associations, sponsorships, chambers of commerce |
 
-Multi-location: one page per real location with unique content (see location-page limits in `content.md`).
+Multi-location: one page per real location with unique content (see location-page limits in `business/seo/content.md`).
 
 ## International (hreflang)
 

@@ -1,6 +1,6 @@
 # Video tells - what makes an edit look automatic
 
-Each row is a default, not a ban. It is right when the creator's style (`.claude/EDITSTYLE.md`) or the user's request chose it. It is a tell when it arrived because nothing was decided.
+Each row is a default, not a ban. It is right when the creator's style (`.sole/EDITSTYLE.md`) or the user's request chose it. It is a tell when it arrived because nothing was decided.
 
 ## Real footage
 

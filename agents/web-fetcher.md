@@ -7,7 +7,7 @@ model: haiku
 
 For each URL in your brief:
 1. Try `WebFetch`.
-2. If it fails, is empty, or shows a block/JS page: run `python3 <Sole skill folder>/scripts/fetch.py "<url>" --skip-direct` (Windows: `python`) (the Sole skill folder path is in your brief). If Python is missing, run `curl -s --max-time 30 "https://r.jina.ai/<url>"` up to 3 times.
+2. If it shows a CAPTCHA, a bot check, a login or a refusal (401, 403, 429, "access denied"): stop for that URL and report it. If it fails for another reason, is empty, or needs JavaScript: run `python3 <Sole skill folder>/scripts/fetch.py "<url>" --skip-direct` (Windows: `python`) (the Sole skill folder path is in your brief). If Python is missing, run `curl -s --max-time 30 "https://r.jina.ai/<url>"` up to 3 times.
 3. If everything fails, report it; do not try other bypass methods.
 
 Rules:

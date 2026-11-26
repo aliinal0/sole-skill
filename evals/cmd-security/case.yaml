@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: cmd-security
+description: The security slash command loads its module and does the job (reuses the security-routing scenario).
+tags: [command]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 14
+  allowed_tools: [Skill, Read, Glob, Grep]
+  prompt: |
+    /sole:security quick app.py
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'security-audit\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: evidence-and-fix
+    criteria: |
+      PASS if the review (a) identifies the SQL injection in the search endpoint and the missing ownership check on the invoice
+      endpoint, (b) cites file and line or function names as evidence, (c) gives a concrete smallest fix for each (parameterized query;
+      check invoice.owner_id == current user), and (d) does not pad the answer with generic best-practice items presented as vulnerabilities. FAIL otherwise.
+

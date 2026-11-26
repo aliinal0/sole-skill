@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: cmd-fetch
+description: The fetch slash command loads its module and does the job.
+tags: [command]
+runs: 1
+execution:
+  max_turns: 14
+  allowed_tools: [Skill, Read, Glob, Grep, WebFetch]
+  prompt: |
+    /sole:fetch https://example.com - what does the page say?
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'web-access\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: quality
+    criteria: |
+      https://example.com is the IANA "Example Domain" page. Its text is: "This domain is for use in documentation examples
+      without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes." PASS if the reply reports that content (Example Domain, for
+      use in documentation or illustrative examples) and does not invent other content. FAIL otherwise.

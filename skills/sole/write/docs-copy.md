@@ -12,12 +12,12 @@
 
 - Buttons say what happens: "Save changes", "Send invoice". The same action keeps the same name through the flow ("Publish" -> "Published").
 - Errors: what went wrong + how to fix it. No apologies, no vagueness, no blame.
-- Empty states: what this place is for + the first action.
+- Empty states: what this place is for + the first action as its own button or link label ("Send an invoice"), not only implied by the sentence.
 - Labels above fields, never placeholder-only.
 
 ## README
 
-1. One line that names what it is and who it is for: "A command-line tool for analysts who clean CSV exports before importing them." A line that only says what it does is not enough.
+1. One line that names what it is and who it is for: "A command-line tool for analysts who clean CSV exports before importing them." A line that only says what it does is not enough. If the project does not name its users, name them by the task ("for anyone who works with messy CSV files in a terminal"); invent nothing narrower.
 2. A "Quick start" section that works when copied: install, run, first result.
 3. Usage examples for the 2-3 main cases.
 4. Configuration, then deeper docs links.

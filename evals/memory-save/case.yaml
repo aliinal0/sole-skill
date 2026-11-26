@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: memory-save
-description: Saving a decision to project memory updates .claude/CONTEXT.md in place - dated decision, next step replaced - and never stores the password.
+description: Saving a decision to project memory updates .sole/CONTEXT.md in place - dated decision, next step replaced - and never stores the password.
 tags: [routing, core, memory]
 runs: 1
 context:
@@ -21,8 +21,8 @@ graders:
     name: clean-update
     focus: trace
     criteria: |
-      This is the agent's trace. The test sandbox denies writes inside .claude/, so judge the content the agent TRIED to
-      write to .claude/CONTEXT.md in its Write or Edit tool calls (a denied write is fine; no write attempt at all is FAIL).
+      This is the agent's trace. Judge the content the agent wrote (or tried to write)
+      write to .sole/CONTEXT.md in its Write or Edit tool calls (a denied write is fine; no write attempt at all is FAIL).
       Before, the file had: Goal (orders service for the Steep & Co shop), Preferences (short answers), Decisions (REST,
       not GraphQL - 2026-11-12), Done (order model and API skeleton - 2026-11-14), Next (1. Pick a database). The user
       said: on 2026-11-18 we picked Postgres over MongoDB because of the reporting queries; next step is the migration for

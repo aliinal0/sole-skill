@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: SEO and AI-search work - audit, page, technical, content, content-brief, schema, images, sitemap, geo, agentic, local, hreflang, ecommerce, plan, cluster, programmatic, competitor-pages, sxo, backlinks, drift
 argument-hint: "<command> <url or topic>"
 ---

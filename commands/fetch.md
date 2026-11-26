@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Read a URL the normal fetch cannot open (Jina / Firecrawl fallback)
 argument-hint: "<url> [what to extract]"
 ---

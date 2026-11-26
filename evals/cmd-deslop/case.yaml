@@ -1,0 +1,34 @@
+schema_version: "1.1"
+name: cmd-deslop
+description: The deslop slash command loads its module and does the job.
+tags: [command]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 14
+  allowed_tools: [Skill, Read, Glob, Grep, Edit, Write]
+  prompt: |
+    /sole:deslop about.txt
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'humanize-text\.md'
+    min: 1
+    arm: with-only
+  - type: regex
+    name: tells-gone
+    target: { source: file, path: about.txt }
+    pattern: 'fast-paced|isn.t just|journey|empower|unlock|seamless|state-of-the-art|elevate|in conclusion|game-changer|unleash'
+    flags: i
+    match: not_contains
+  - type: llm
+    name: quality
+    focus: { source: file, path: about.txt }
+    criteria: |
+      This is about.txt after the deslop command. The original said: Fernhill Pottery, founded in 2019 in Frome, runs
+      hands-on wheel classes; classes cost £35 for two hours; plus AI filler (fast-paced world, journey, empower, unlock,
+      seamless, state-of-the-art kilns, elevate, game-changer, unleash). PASS if the file now reads as plain human text, keeps
+      2019, Frome, wheel classes and £35 for two hours, and adds no new facts (no new features, prices, testimonials or calls
+      to action). FAIL otherwise.

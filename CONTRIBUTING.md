@@ -11,7 +11,7 @@ Thanks for helping. Sole stays useful only if it stays small, so every change is
 
 ## Adding a module
 
-Follow [docs/adding-a-module.md](docs/adding-a-module.md). In short: one file under ~120 lines in the right layer, one row in the routing table of the skill that owns the area (`skills/<skill>/SKILL.md`), reuse existing modules instead of copying their rules, and credit any source you adapted.
+Follow [docs/adding-a-module.md](docs/adding-a-module.md). In short: one file under 100 lines in the right layer, one row in the routing table of the skill that owns the area (`skills/<skill>/SKILL.md`), reuse existing modules instead of copying their rules, and credit any source you adapted.
 
 Only adapt work under MIT, Apache-2.0 or a similar permissive license, and add it to [CREDITS.md](CREDITS.md).
 

@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: voice-mimic
-description: '"Write in my voice" finds and follows .claude/VOICE.md - closing, punctuation, banned words - and keeps the facts exact.'
+description: '"Write in my voice" finds and follows .sole/VOICE.md - closing, punctuation, banned words - and keeps the facts exact.'
 tags: [routing, write, voice, english]
 runs: 1
 context:

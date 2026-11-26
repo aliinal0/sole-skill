@@ -17,7 +17,7 @@
    - social and ads libraries (Meta Ad Library, Google Ads Transparency, LinkedIn ads) for messaging and angles;
    - SEO footprint: top pages, content themes, keywords if a tool is available (see `business/seo-geo.md`).
    Blocked pages -> `research/web-access.md`.
-3. **Save raw notes** to `.claude/sole/competitors/<name>.md` so later sessions do not re-scrape. The final report goes to `docs/sole/competitors/YYYY-MM-DD-<topic>.md` (ask once before the first report goes into the project).
+3. **Save raw notes** to `.sole/competitors/<name>.md` so later sessions do not re-scrape. The final report goes to `docs/sole/competitors/YYYY-MM-DD-<topic>.md` (ask once before the first report goes into the project).
 4. **Synthesise** (do not staple the profiles together):
    - comparison matrix: pricing, target customer, key features, positioning line, channels;
    - positioning map on the two axes that matter most to buyers;

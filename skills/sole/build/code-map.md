@@ -5,7 +5,7 @@ Re-exploring a large repo every session is the biggest silent token cost. Build 
 ## 1. Use what exists
 
 - `graphify-out/GRAPH_REPORT.md` or `graphify-out/graph.json` exists -> answer architecture questions from it first (`graphify query "<question>"` if the CLI is installed). Read source only to confirm.
-- `.claude/CODEMAP.md` exists -> read it first.
+- `.sole/CODEMAP.md` exists -> read it first.
 - One targeted lookup ("where is X defined", "what calls Y") in a normal-size repo -> just `Grep`; no map needed.
 
 ## 2. Build a map when it pays off
@@ -20,7 +20,7 @@ Then `/graphify .`. Code extraction is local and free; semantic extraction of do
 
 Tell the user before installing: graphify's own installer also adds its own `/graphify` skill, a section in `CLAUDE.md`, and a hook that runs before every file search. That is graphify working as designed and does not break Sole (this module simply defers to graphify's map), but it is a change to their setup they should agree to. To undo it, uninstall graphify and remove that CLAUDE.md section and hook.
 
-**Option B - lightweight CODEMAP (built in, no install).** Launch 2-4 Explore/general-purpose agents in parallel, one per top-level area. Each returns <= 40 lines. Merge into `.claude/CODEMAP.md`:
+**Option B - lightweight CODEMAP (built in, no install).** Launch 2-4 Explore/general-purpose agents in parallel, one per top-level area. Each returns <= 40 lines. Merge into `.sole/CODEMAP.md`:
 
 ```markdown
 # Code map - <repo>  (updated YYYY-MM-DD, commit <short-sha>)
@@ -38,7 +38,7 @@ Keep it under ~150 lines. Link files; do not paste code.
 ## 3. Keep it fresh
 
 - After a change that moves modules or adds an entry point, update the relevant lines (graphify: `graphify . --update`).
-- Put the map's path in `.claude/CONTEXT.md` -> `## Key files` so the memory hook points future sessions to it.
+- Put the map's path in `.sole/CONTEXT.md` -> `## Key files` so the memory hook points future sessions to it.
 - If the map and the code disagree, the code wins; fix the map.
 
 Credit: graphify by Safi Shamsi (Apache-2.0) is integrated as an optional external tool, not bundled.

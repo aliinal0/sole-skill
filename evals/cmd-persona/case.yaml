@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: cmd-persona
+description: The persona slash command loads its module and does the job (reuses the persona-view scenario).
+tags: [command]
+runs: 1
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 14
+  allowed_tools: [Skill, Read, Glob, Grep, WebFetch]
+  prompt: |
+    /sole:persona UX researcher: review the onboarding flow in onboarding.md
+graders:
+  - type: tool_used
+    name: read-module
+    tool: Read
+    input_match: 'personas\.md'
+    min: 1
+    arm: with-only
+  - type: llm
+    name: grounded-no-invented-research
+    criteria: |
+      onboarding.md (you cannot see it) describes a 7-step wizard after email sign-up: company name, size and industry;
+      role and a required phone number; a required "how did you hear about us?"; invite teammates (skippable); a required
+      credit card to start a 14-day free trial; connect a calendar (skippable); pick a theme colour; then an empty dashboard
+      that only says "No data yet." Known numbers: 1,800 sign-ups started last month, 410 reached the dashboard (about 23%).
+      PASS if the view is tied to these specifics (e.g. the required phone and card before any value, the empty
+      dashboard, the length of the wizard), says what to research or test with real users and which metric to watch, uses
+      only the two numbers given, and does not invent research data (no made-up percentages per step, interview quotes or
+      study results) or present role-play credentials ("as a researcher with 15 years...") as fact. FAIL otherwise.
+

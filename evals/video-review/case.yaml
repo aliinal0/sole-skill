@@ -28,8 +28,11 @@ graders:
       and (c) does not invent problems that are not in the files. FAIL otherwise.
       Facts in the files (you cannot see them, so trust these): edl.json has 24 shots of talk.mp4, each exactly 1.5 s, and
       each shot starts 0.12 s after the previous one ends in the source; every shot has a 120% punch-in and a whoosh.
-      edit_notes.md says a silence remover removed every pause and the music sits at -6 dB under the voice for the whole
-      video. No footage or transcript is given. Reading the 0.12 s gaps as the removed pauses, or noting that perfectly
+      edit_notes.md ("My first month freelancing", YouTube, 16:9) says: a silence remover at -30 dB, minimum 0.1 s removed
+      every pause; a cut every 1.5 s exactly; captions one word at a time, bold yellow uppercase, emoji after key words
+      (money, late); a stock clip for every sentence (laptop typing, cash counting, calendar flipping, handshake); upbeat
+      royalty-free music at -6 dB under the voice for the whole video; a teal-orange LUT at 100%; the hook text "What if I
+      told you freelancing is a trap?" at 0 s. Quoting these details is accurate. No footage or transcript is given. Reading the 0.12 s gaps as the removed pauses, or noting that perfectly
       even gaps do not look like a silence remover's output, are both fair. Citing general reference numbers (shot-length
       variation in human-edited films, loudness targets) is not an invented problem. A consequence the files suggest but
       cannot show (cuts on a timer may land mid-word) is fine when framed as a risk to check; stated as a certain fact

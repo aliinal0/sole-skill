@@ -1,6 +1,6 @@
 # Credits
 
-Sole does not copy these skills verbatim. Their ideas, structures and checklists were condensed, rewritten and merged into Sole's modules. Each module names its sources at the bottom. All adapted material has been modified.
+Sole does not copy these skills verbatim. Their ideas, structures and checklists were condensed, rewritten and merged into Sole's modules. Modules adapted from other work name their sources in the file. All adapted material has been modified.
 
 | Source | Author | License | Used in |
 |---|---|---|---|

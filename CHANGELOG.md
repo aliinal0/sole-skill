@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.2.0 - 2026-11-26 - notes in `.sole/`, safety fixes, bug hunt
+
+- **Notes move to `.sole/`**: `CONTEXT.md`, `CODEMAP.md`, `VOICE.md`, `EDITSTYLE.md` and the caches now live in `.sole/` instead of `.claude/`. Claude Code asks before every write under `.claude/`, so saving a note used to need your OK each time, and in a headless run the write failed and Claude fell back to its own memory. Projects from older versions keep working: the hook and the skills read `.claude/CONTEXT.md` when `.sole/` has none, and the next save writes the file to `.sole/` and tells you the old copy can be deleted. The improve learnings file moves from `~/.claude/sole-improve-learnings.md` to `~/.sole/improve-learnings.md` the same way.
+
+A planned bug hunt: every case run three times, a test for every slash command, injection and secret tests, a routing matrix, a model and effort matrix, and real sessions on a shell, a browser and memory after compaction.
+
+Test results: 57 of 62 cases pass with Sole, 32 of 62 without (one run each, Claude Code 2.1.330). Sixteen cases start with a Sole slash command, so plain Claude cannot really pass them; without those, 42 of 46 against 25 of 46. Cost per passing answer: $0.18 with Sole, $0.22 without (API list prices); a run with Sole costs about 1.5 times as much.
+
+- **Safety**:
+  - Asked to save a password to project memory, Sole tried to write it to Claude Code's own memory in 2 of 3 runs. The session hint and the memory module now forbid it (5 of 5 runs clean).
+  - `/sole:improve` and setup fixes edited `CLAUDE.md` before the user picked anything, in every run since 1.1.0. The module now opens with the rule and checks it again before replying (4 of 5 runs clean; one run still edits).
+  - `fetch.py` refuses local, private, link-local and credential URLs, also after a redirect; stops on 401, 403, 429 and "access denied" pages; stops on 404 and 410 instead of asking a reader service; caps the read size.
+  - The SessionStart hook does not follow a symlinked `CONTEXT.md`, caps it at 200 lines and 16,000 bytes, strips control characters and marks it as untrusted notes.
+  - `video_check.py` finds ffmpeg only on the PATH or by absolute path, and reads local files only.
+- **Quality**: rewrites no longer turn praise into new claims; ads list unconfirmed claims (testimonials, platforms) instead of using them; code clean-up adds no comments; image prompts leave the headline side empty and avoid objects with writing on them; READMEs name their reader; empty states name their first action as a button label; research plans check that rules are current; idea tables are sorted by their totals.
+- **Slash commands** are user-invoked only: about 680 fewer always-loaded tokens, and Claude no longer runs a command when a skill fits.
+- **Tests**: 62 eval cases (21 new: one per slash command, six for safety), 34 unit tests, a routing matrix (36 of 38 prompts open the right skill or none). Model matrix on 12 cases: Sonnet 12/12, Haiku 11/12, Opus at low effort 9/12.
+- **Runner fixes**: the cache key now covers every module a case can load; failed or refused runs are never cached; `--explain` works; usage-limit waits read dated resets; Windows output no longer crashes.
+- **Corrections to earlier numbers**: 1.1.0 was 37 of 41, not 38 of 41. One check (no edits before the user picks) was marked as information only, which hid a failure. One case (`lean-mode`) starts with a slash command, so the "without" score had one case plain Claude could not pass. Skill body sizes in 1.1.0 were 460 to 582 words and 904 for `sole:code`.
+
 ## 1.1.0 - 2026-11-21 - five skills, lazy-senior coding
 
 Sole is now five skills that share one module library: `sole:code`, `sole:visual`, `sole:write`, `sole:business` and the general `sole:sole`. Each skill has its own description, so each area gets precise trigger words. A request loads only its own area's table: 433 to 555 words instead of the 822-word router, or 877 for `sole:code`, which carries its coding rules inline.

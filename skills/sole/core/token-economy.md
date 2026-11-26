@@ -6,7 +6,7 @@ Most tokens are spent on **input** (files read, tool output, chat history), not 
 
 1. **Load less.** Read only the module and file sections you need. Use `Grep` / `offset`+`limit` before reading whole files.
 2. **Delegate wide reads.** Searches across many files or many web pages go to a subagent. Keep its summary, not its transcript.
-3. **Memory over re-reading.** After a reset, read `.claude/CONTEXT.md` instead of re-exploring the repo or the chat.
+3. **Memory over re-reading.** After a reset, read `.sole/CONTEXT.md` instead of re-exploring the repo or the chat.
 4. **Trim tool output.** Pipe long commands through `head`, `tail`, `grep`; ask for `--quiet` flags; never dump lockfiles, logs or minified files.
 5. **Do not re-read** a file you just wrote or edited.
 

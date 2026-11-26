@@ -38,4 +38,4 @@ graders:
       PASS if the file keeps calculate_invoice_total with that exact calculation (same Decimal conversion, same default
       "standard" rate, VAT via vat_for, no added rounding), lets the ValueError propagate (no broad try/except, no print),
       has no factory or class layer around a single function, no comments that narrate the code and no template docstrings
-      that only restate the signature, and uses domain names (items, line, total) rather than data/result. FAIL otherwise.
+      that only restate the signature, and uses domain names (such as items, line, net, total) rather than data/result. FAIL otherwise.

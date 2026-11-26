@@ -1,7 +1,7 @@
 # Adding a module
 
 1. **Pick the layer** in the library (`skills/sole/`): `build/`, `business/`, `research/` or `write/`. If it applies to every request, it belongs in `core/` (rare).
-2. **Create `skills/sole/<layer>/<name>.md`**, under ~120 lines:
+2. **Create `skills/sole/<layer>/<name>.md`**, under 100 lines:
    - one-line goal;
    - "Before starting": only the questions that change the result;
    - the method as numbered steps;

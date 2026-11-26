@@ -14,7 +14,7 @@ Claude's built-in fetch does not run JavaScript and is refused by many sites. Us
 4. **Browser tools**: the sole-browser plugin (`build/browser-checks.md` -> "Reading a hard page"), or another browser the session has (Claude in Chrome, the built-in browser, Playwright MCP). Open the page and read its text.
 5. **Ask the user** to paste the content or export it.
 
-One command runs steps 1-3 for you:
+One command tries a direct request, then steps 2 and 3:
 ```bash
 python3 "<skill-folder>/scripts/fetch.py" "<URL>" [--max-chars 20000]   # Windows: python
 ```
@@ -23,8 +23,9 @@ It prints which method worked on stderr and the page markdown on stdout.
 ## Picking the right path
 
 - Search for current facts first (`WebSearch`), then fetch only the 2-5 best pages.
-- X/Twitter and many SPAs (content built by JavaScript) -> go straight to Jina.
-- A CAPTCHA, a "verify you are human" page or any other bot check means stop: do not route around it through Jina, Firecrawl, a browser or another service. Ask the user to open the page themselves and paste or export what they need, or use an official API.
+- X/Twitter and many SPAs (content built by JavaScript) -> start with Jina (`--skip-direct`).
+- A CAPTCHA, a "verify you are human" page, any other bot check, or a refusal (401, 403, 429, "access denied") means stop: do not route around it through Jina, Firecrawl, a browser or another service. Ask the user to open the page themselves and paste or export what they need, or use an official API.
+- A page on the user's own machine or network (localhost, 10.x, 192.168.x) or a URL with a password in it: never send it to Jina or Firecrawl. `fetch.py` refuses it; use `--allow-private` only when the user asked for that page.
 - Many URLs -> one `web-fetcher` agent per batch, in parallel; each returns a summary, not raw pages.
 - Prefer official APIs, RSS feeds, sitemaps and `/llms.txt` when they exist; they are cleaner and cheaper.
 

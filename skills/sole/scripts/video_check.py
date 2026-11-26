@@ -36,11 +36,21 @@ TRUE_PEAK_FLAG = -1.0                    # dBTP
 FFMPEG = "ffmpeg"
 
 
+def tool(name):
+    """Absolute path of a program on PATH, never one lying in the current folder (Windows looks there first)."""
+    import os
+    found = shutil.which(name)
+    here = os.path.realpath(os.getcwd())
+    return os.path.abspath(found) if found and os.path.dirname(os.path.realpath(found)) != here else None
+
+
 def find_ffmpeg(explicit):
     import os
-    for cand in (explicit, os.environ.get("FFMPEG_BINARY"), shutil.which("ffmpeg")):
+    for cand in (explicit, os.environ.get("FFMPEG_BINARY")):
         if cand and (shutil.which(cand) or os.path.isfile(cand)):
             return cand
+    if tool("ffmpeg"):
+        return tool("ffmpeg")
     try:
         import imageio_ffmpeg
         return imageio_ffmpeg.get_ffmpeg_exe()
@@ -54,12 +64,12 @@ def stderr_of(cmd):
 
 
 def duration_of(video):
-    if shutil.which("ffprobe"):
-        out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", video],
+    if tool("ffprobe"):
+        out = subprocess.run([tool("ffprobe"), "-protocol_whitelist", "file", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", video],
                              capture_output=True, text=True).stdout.strip()
         if out:
             return float(out)
-    m = re.search(r"Duration: (\d+):(\d+):([0-9.]+)", stderr_of([FFMPEG, "-hide_banner", "-i", video]))
+    m = re.search(r"Duration: (\d+):(\d+):([0-9.]+)", stderr_of([FFMPEG, "-hide_banner", "-protocol_whitelist", "file", "-i", video]))
     return int(m.group(1)) * 3600 + int(m.group(2)) * 60 + float(m.group(3)) if m else 0.0
 
 
@@ -69,7 +79,7 @@ def scene_cuts(video, hard=0.3, k=8.0, floor=0.02, win=15, min_gap=0.25):
     A fixed threshold misses jump cuts inside one framing; a spike relative to the local median finds them.
     Synthetic benchmark: 31/31 hard cuts, 10/9 jump cuts, 0-2 false cuts in 30-40 s of uncut motion.
     """
-    log = stderr_of([FFMPEG, "-hide_banner", "-i", video, "-an", "-filter:v",
+    log = stderr_of([FFMPEG, "-hide_banner", "-protocol_whitelist", "file", "-i", video, "-an", "-filter:v",
                      "select='gte(scene,0)',metadata=print:key=lavfi.scene_score", "-f", "null", "-"])
     times = [float(t) for t in re.findall(r"pts_time:([0-9.]+)", log)]
     scores = [float(s) for s in re.findall(r"lavfi\.scene_score=([0-9.]+)", log)]
@@ -87,7 +97,7 @@ def scene_cuts(video, hard=0.3, k=8.0, floor=0.02, win=15, min_gap=0.25):
 
 
 def silences(video, duration, noise="-35dB", min_len=0.25):
-    log = stderr_of([FFMPEG, "-hide_banner", "-i", video, "-vn", "-af",
+    log = stderr_of([FFMPEG, "-hide_banner", "-protocol_whitelist", "file", "-i", video, "-vn", "-af",
                      f"silencedetect=noise={noise}:d={min_len}", "-f", "null", "-"])
     found = [float(d) for d in re.findall(r"silence_duration: ([0-9.]+)", log)]
     starts = re.findall(r"silence_start: ([0-9.]+)", log)
@@ -97,7 +107,7 @@ def silences(video, duration, noise="-35dB", min_len=0.25):
 
 
 def loudness(video):
-    log = stderr_of([FFMPEG, "-hide_banner", "-i", video, "-vn", "-af", "ebur128=peak=true", "-f", "null", "-"])
+    log = stderr_of([FFMPEG, "-hide_banner", "-protocol_whitelist", "file", "-i", video, "-vn", "-af", "ebur128=peak=true", "-f", "null", "-"])
     summary = log[log.rfind("Summary:"):] if "Summary:" in log else log
     i = re.search(r"I:\s+(-?[0-9.]+) LUFS", summary)
     p = re.search(r"True peak:\s+Peak:\s+(-?[0-9.]+|-inf)", summary)
@@ -161,6 +171,10 @@ def main():
         source = a.edl
     else:
         FFMPEG = find_ffmpeg(a.ffmpeg)
+        import os
+        if not os.path.isfile(a.video):
+            sys.exit(f"error: no such file: {a.video}")
+        a.video = os.path.abspath(a.video)  # a name starting with "-" must not be read as an option
         duration = duration_of(a.video)
         cuts = [0.0] + [t for t in scene_cuts(a.video, hard=a.threshold) if 0.1 < t < duration - 0.1] + [duration]
         lengths = [end - start for start, end in zip(cuts, cuts[1:])]

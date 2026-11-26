@@ -8,7 +8,7 @@
 4. Current state: running ads? Best and worst performers, budget, platforms.
 5. Constraints: brand rules, legal/claims limits, languages.
 
-If `.claude/CONTEXT.md` or a positioning doc exists, read it instead of asking.
+If `.sole/CONTEXT.md` or a positioning doc exists, read it instead of asking.
 
 ## Platform choice
 
@@ -40,7 +40,7 @@ Rules:
 - One idea per ad. Concrete numbers and nouns over adjectives.
 - Write the way the customer talks (mine reviews, Reddit, support tickets for exact phrases).
 - Check every variation against platform limits (e.g. Google RSA headline 30 chars, description 90).
-- Only facts the user gave go into copy. A claim you would like to use but cannot support (a user count, a rate such as "10,000 steps = 50p", an integration, a partner name, "busier than ever", a review score, a fundraising target the user did not set) goes in a short "facts to confirm" list under the ads, never into the copy itself.
+- Only facts the user gave go into copy. A claim you would like to use but cannot support (a user count, a rate such as "10,000 steps = 50p", an integration, a partner name, "busier than ever", a review score, a fundraising target the user did not set, a first-person quote or testimonial nobody gave, "no sign-up", "on iOS and Android") goes in a short "facts to confirm" list under the ads, never into the copy itself.
 - Pass final copy through `write/humanize-text.md`. Ad copy is where AI phrasing ("Unlock", "Elevate", "Seamless", "Game-changer") kills trust fastest.
 
 ## Creatives
@@ -54,7 +54,7 @@ Rules:
 1. Rank by the goal metric, not CTR alone.
 2. Winners: what angle, hook, format? Make 3-5 new variations of each winning angle.
 3. Losers: kill, and note why in the test log.
-4. Record the learning in `.claude/CONTEXT.md` -> `## Decisions`.
+4. Record the learning in `.sole/CONTEXT.md` -> `## Decisions`.
 
 ## Output
 

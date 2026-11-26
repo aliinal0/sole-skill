@@ -5,7 +5,7 @@
 # answered from the skill file alone and missed the module's rules. Prints nothing for any other
 # skill. Reads the hook input from stdin only.
 input=$(cat)
-skill=$(printf '%s' "$input" | grep -Eo '"skill"[[:space:]]*:[[:space:]]*"(sole:)?(sole|code|visual|write|business)"' | head -n 1 | sed -E 's/.*"(sole:)?([a-z]+)"$/\2/')
+skill=$(printf '%s' "$input" | grep -Eo '"skill"[[:space:]]*:[[:space:]]*"sole:(sole|code|visual|write|business)"' | head -n 1 | sed -E 's/.*"(sole:)([a-z]+)"$/\2/')
 [ -n "$skill" ] || exit 0
 root="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 # JSON-escape backslashes and quotes in the path (Windows paths contain backslashes).
